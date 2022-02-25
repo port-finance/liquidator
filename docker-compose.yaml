@@ -1,0 +1,16 @@
+version: "3.3"
+services:
+  portfinance-liquidator:
+    image: portfinance-liquidator
+    restart: unless-stopped
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - CLUSTER=mainnet-beta
+      - CLUSTER_URL=https://solana-api.projectserum.com
+      - KEYPAIR=/.config/solana/id.json
+      - PROGRAM_ID=Port7uDYB3wk6GJAw4KT1WpTeMtSu9bTcChBHkX2LfR
+      - CHECK_INTERVAL=2500.0
+    volumes:
+      - "./id.json:/.config/solana/id.json"
