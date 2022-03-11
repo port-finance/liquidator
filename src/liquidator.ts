@@ -46,11 +46,11 @@ const portEnvironment = Environment.forMainNet();
 interface EnrichedObligation {
   riskFactor: number;
   // loan value in USD
-  loanValue: Big;
+  totalLoanValue: Big;
   // collateral value in USD
-  collateralValue: Big;
+  totalLiquidationLoanValue: Big;
   obligation: PortProfile;
-  borrowedAssetNames: string[];
+  loanAssetNames: string[];
   depositedAssetNames: string[];
 }
 
@@ -98,7 +98,7 @@ async function runLiquidator() {
             .toString()} which is owned by ${unhealthyObligation.obligation
             .getOwner()
             ?.toBase58()} with risk factor: ${unhealthyObligation.riskFactor}
-which has borrowed ${unhealthyObligation.loanValue} ...
+which has borrowed ${unhealthyObligation.totalLoanValue} ...
 `,
         );
         await liquidateUnhealthyObligation(
@@ -328,9 +328,9 @@ Total number of loans are ${portBalances.length} and possible liquidation debts 
   sortedObligations.slice(0, DISPLAY_FIRST).forEach((ob) =>
     console.log(
       `Risk factor: ${ob.riskFactor.toFixed(4)} borrowed amount: ${
-        ob.loanValue
-      } deposit amount: ${ob.collateralValue}
-borrowed asset names: [${ob.borrowedAssetNames.toString()}] deposited asset names: [${ob.depositedAssetNames.toString()}]
+        ob.totalLoanValue
+      } liquidation loan value amount: ${ob.totalLiquidationLoanValue}
+borrowed asset names: [${ob.loanAssetNames.toString()}] deposited asset names: [${ob.depositedAssetNames.toString()}]
 obligation pubkey: ${ob.obligation.getProfileId().toString()}
 `,
     ),
@@ -354,7 +354,7 @@ function generateEnrichedObligation(
   tokenToCurrentPrice: Map<string, Big>,
   reserveContext: ReserveContext,
 ): EnrichedObligation {
-  let totalLiquidationPrice = new Big(0);
+  let totalLoanValue = new Big(0);
   const loanAssetNames: string[] = [];
   const assetCtx = portEnvironment.getAssetContext();
   for (const loan of obligation.getLoans()) {
@@ -369,17 +369,17 @@ function generateEnrichedObligation(
       throw new Error('token price not found');
     }
 
-    const liquidationPrice = loan
+    const loanValue = loan
       .accrueInterest(reserve.asset.getCumulativeBorrowRate())
       .getRaw()
       .mul(tokenPrice)
-      .div(reserve.getQuantityContext().multiplier); //TODO: test
-    totalLiquidationPrice = totalLiquidationPrice.add(liquidationPrice);
+      .div(reserve.getQuantityContext().multiplier);
+    totalLoanValue = totalLoanValue.add(loanValue);
     loanAssetNames.push(name ?? 'unknown');
   }
-  let collateralValue: Big = new Big(0);
-  const depositedAssetNames: string[] = [];
 
+  let totalLiquidationLoanValue: Big = new Big(0);
+  const depositedAssetNames: string[] = [];
   for (const deposit of obligation.getCollaterals()) {
     const reservePubKey = deposit.getReserveId().toString();
     const name = assetCtx
@@ -393,27 +393,27 @@ function generateEnrichedObligation(
     if (!tokenPrice || !exchangeRatio) {
       throw new Error('error in token price or exchange ratio');
     }
-    const totalPrice = deposit
+    const liquidationLoanValue = deposit
       .getRaw()
       .div(exchangeRatio.getRaw())
       .mul(tokenPrice)
       .mul(liquidationThreshold)
-      .div(reserve.getQuantityContext().multiplier); // TODO: test
-    collateralValue = collateralValue.add(totalPrice);
+      .div(reserve.getQuantityContext().multiplier);
+    totalLiquidationLoanValue = totalLiquidationLoanValue.add(liquidationLoanValue);
     depositedAssetNames.push(name ?? 'unknown');
   }
 
   const riskFactor: number =
-    collateralValue.eq(ZERO) || totalLiquidationPrice.eq(ZERO)
+    totalLiquidationLoanValue.eq(ZERO) || totalLoanValue.eq(ZERO)
       ? 0
-      : totalLiquidationPrice.div(collateralValue).toNumber();
+      : totalLoanValue.div(totalLiquidationLoanValue).toNumber();
 
   return {
-    loanValue: totalLiquidationPrice,
-    collateralValue,
+    totalLoanValue,
+    totalLiquidationLoanValue,
     riskFactor,
     obligation,
-    borrowedAssetNames: loanAssetNames,
+    loanAssetNames,
     depositedAssetNames,
   };
 }
