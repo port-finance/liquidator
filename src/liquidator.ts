@@ -78,7 +78,9 @@ async function runLiquidator() {
 
   console.log(`Port liquidator launched on cluster=${clusterUrl}`);
 
-  const reserveContext = await Port.forMainNet({}).getReserveContext();
+  const reserveContext = await Port.forMainNet({
+    connection,
+  }).getReserveContext();
 
   const wallets = await prepareTokenAccounts(provider, reserveContext);
 

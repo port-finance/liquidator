@@ -31,7 +31,7 @@
     "typescript": "^4.0.5"
   },
   "dependencies": {
-    "@port.finance/port-sdk": "^0.2.23",
+    "@port.finance/port-sdk": "^0.2.67",
     "@project-serum/common": "^0.0.1-beta.3",
     "@project-serum/serum": "^0.13.41",
     "@pythnetwork/client": "^2.2.0",
