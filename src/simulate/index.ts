@@ -10,7 +10,7 @@ const thresholdOverride = new Map(
     Percentage.fromHundredBased(v),
   ]),
 );
-const DISPLAY_TOP_N = 20;
+const DISPLAY_TOP_N = 1;
 
 (async function main() {
   const clusterUrl = 'https://port-finance.rpcpool.com';
@@ -38,11 +38,12 @@ const DISPLAY_TOP_N = 20;
   });
   console.log('Simulating unhealthy profiles with override:');
   console.log(JSON.stringify(OVERRIDE, null, 2));
+  const minimumLoanThreshold = 100;
   const unhealthyObligations = (
     await getUnhealthyObligations(connection, thresholdOverride)
-  ).filter((ob) => ob.loanValue.gt(1));
+  ).filter((ob) => ob.loanValue.gt(minimumLoanThreshold));
   console.log(
-    `Total liquidate-able profiles with loan value > $1: ${unhealthyObligations.length}`,
+    `Total liquidate-able profiles with loan value > $${minimumLoanThreshold}: ${unhealthyObligations.length}`,
   );
 
   console.log(`The most risky ${DISPLAY_TOP_N} profiles:`);
