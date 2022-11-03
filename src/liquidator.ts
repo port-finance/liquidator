@@ -36,6 +36,7 @@ import {
   ReserveContext,
   ReserveId,
   ReserveInfo,
+  Percentage,
 } from '@port.finance/port-sdk';
 
 const SOL_MINT = 'So11111111111111111111111111111111111111112';
@@ -88,6 +89,16 @@ async function runLiquidator() {
   while (true) {
     try {
       const unhealthyObligations = await getUnhealthyObligations(connection);
+      unhealthyObligations.slice(0, DISPLAY_FIRST).forEach((ob) =>
+        console.log(
+          `Risk factor: ${ob.riskFactor.toFixed(4)} borrowed amount: ${
+            ob.loanValue
+          } deposit amount: ${ob.collateralValue}
+  borrowed asset names: [${ob.borrowedAssetNames.toString()}] deposited asset names: [${ob.depositedAssetNames.toString()}]
+  obligation pubkey: ${ob.obligation.getProfileId().toString()}
+`,
+        ),
+      );
       console.log(
         `Time: ${new Date()} - payer account ${payer.publicKey.toBase58()}, we have ${
           unhealthyObligations.length
@@ -100,8 +111,8 @@ async function runLiquidator() {
             .toString()} which is owned by ${unhealthyObligation.obligation
             .getOwner()
             ?.toBase58()} with risk factor: ${unhealthyObligation.riskFactor}
-which has borrowed ${unhealthyObligation.loanValue} ...
-`,
+      which has borrowed ${unhealthyObligation.loanValue} ...
+      `,
         );
         await liquidateUnhealthyObligation(
           provider,
@@ -110,7 +121,6 @@ which has borrowed ${unhealthyObligation.loanValue} ...
           reserveContext,
           wallets,
         );
-
         await redeemRemainingCollaterals(
           provider,
           programId,
@@ -306,8 +316,11 @@ function getTotalShareTokenCollateralized(
   return amounts;
 }
 
-async function getUnhealthyObligations(connection: Connection) {
-  const mainnetPort = Port.forMainNet({});
+export async function getUnhealthyObligations(
+  connection: Connection,
+  thresholdOverride: Map<string, Percentage> = new Map(),
+) {
+  const mainnetPort = Port.forMainNet({ connection });
   const portBalances = await mainnetPort.getAllPortProfiles();
   const reserves = await mainnetPort.getReserveContext();
   const tokenToCurrentPrice = await readTokenPrices(connection, reserves);
@@ -316,7 +329,12 @@ async function getUnhealthyObligations(connection: Connection) {
     .filter((obligation) => !willNeverLiquidate(obligation))
     .filter((obligation) => !isInsolvent(obligation))
     .map((obligation) =>
-      generateEnrichedObligation(obligation, tokenToCurrentPrice, reserves),
+      generateEnrichedObligation(
+        obligation,
+        tokenToCurrentPrice,
+        reserves,
+        thresholdOverride,
+      ),
     )
     .sort((obligation1, obligation2) => {
       return obligation2.riskFactor * 100 - obligation1.riskFactor * 100;
@@ -326,16 +344,6 @@ async function getUnhealthyObligations(connection: Connection) {
     `
 Total number of loans are ${portBalances.length} and possible liquidation debts are ${sortedObligations.length}
 `,
-  );
-  sortedObligations.slice(0, DISPLAY_FIRST).forEach((ob) =>
-    console.log(
-      `Risk factor: ${ob.riskFactor.toFixed(4)} borrowed amount: ${
-        ob.loanValue
-      } deposit amount: ${ob.collateralValue}
-borrowed asset names: [${ob.borrowedAssetNames.toString()}] deposited asset names: [${ob.depositedAssetNames.toString()}]
-obligation pubkey: ${ob.obligation.getProfileId().toString()}
-`,
-    ),
   );
 
   tokenToCurrentPrice.forEach((price: Big, token: string) => {
@@ -355,6 +363,7 @@ function generateEnrichedObligation(
   obligation: PortProfile,
   tokenToCurrentPrice: Map<string, Big>,
   reserveContext: ReserveContext,
+  thresholdOverride: Map<string, Percentage>,
 ): EnrichedObligation {
   let totalLiquidationPrice = new Big(0);
   const loanAssetNames: string[] = [];
@@ -390,7 +399,9 @@ function generateEnrichedObligation(
       .getSymbol();
     const reserve = reserveContext.getReserve(deposit.getReserveId());
     const exchangeRatio = reserve.getExchangeRatio().getPct();
-    const liquidationThreshold = reserve.params.liquidationThreshold.getRaw();
+    const liquidationThreshold =
+      thresholdOverride.get(reserve.getAssetMintId().toString())?.getRaw() ??
+      reserve.params.loanToValueRatio.getRaw();
     const tokenPrice = tokenToCurrentPrice.get(reservePubKey);
     if (!tokenPrice || !exchangeRatio) {
       throw new Error('error in token price or exchange ratio');
