@@ -7,7 +7,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "liquidator": "ts-node src/liquidator.ts",
+    "liquidator": "ts-node src/main.ts",
     "watch": "tsc --watch",
     "clean": "rm -rf dist",
     "prepare": "run-s clean build",

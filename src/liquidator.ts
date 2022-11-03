@@ -55,7 +55,7 @@ interface EnrichedObligation {
   depositedAssetNames: string[];
 }
 
-async function runLiquidator() {
+export async function runLiquidator() {
   const clusterUrl =
     process.env.CLUSTER_URL || 'https://api.mainnet-beta.solana.com';
   const checkInterval = parseFloat(process.env.CHECK_INTERVAL || '8000.0');
@@ -791,5 +791,3 @@ async function redeemCollateral(
 async function _sellToken(_tokenAccount: Wallet) {
   // TODO: sell token using Serum or Raydium
 }
-
-runLiquidator();
