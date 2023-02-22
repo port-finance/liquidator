@@ -4,25 +4,19 @@ import {
   Keypair,
   Transaction,
   sendAndConfirmRawTransaction,
-} from '@solana/web3.js';
-import axios from 'axios';
+} from "@solana/web3.js";
+import axios from "axios";
 import {
   AccountInfo,
   AccountLayout,
   ASSOCIATED_TOKEN_PROGRAM_ID,
   Token,
   TOKEN_PROGRAM_ID,
-} from '@solana/spl-token';
-import { TransactionInstruction } from '@solana/web3.js';
-import Big from 'big.js';
-import { AccountInfo as TokenAccount } from '@solana/spl-token';
-import { getTokenAccount, parseTokenAccount } from '@project-serum/common';
-import { BN, Provider } from '@project-serum/anchor';
-
-export const STAKING_PROGRAM_ID = new PublicKey(
-  'stkarvwmSzv2BygN5e2LeTwimTczLWHCKPKGC2zVLiq',
-);
-export const ZERO: Big = new Big(0);
+} from "@solana/spl-token";
+import { TransactionInstruction } from "@solana/web3.js";
+import { AccountInfo as TokenAccount } from "@solana/spl-token";
+import { getTokenAccount, parseTokenAccount } from "@project-serum/common";
+import { BN, Provider } from "@project-serum/anchor";
 
 export function notify(content: string) {
   if (process.env.WEBHOOK_URL) {
@@ -42,12 +36,12 @@ export const getUnixTs = () => {
 export async function findLargestTokenAccountForOwner(
   connection: Connection,
   owner: Keypair,
-  mint: PublicKey,
+  mint: PublicKey
 ): Promise<TokenAccount> {
   const response = await connection.getTokenAccountsByOwner(
     owner.publicKey,
     { mint },
-    connection.commitment,
+    connection.commitment
   );
   let max = new BN(0);
   let maxTokenAccount: TokenAccount | null = null;
@@ -65,7 +59,7 @@ export async function findLargestTokenAccountForOwner(
   if (maxPubkey && maxTokenAccount) {
     return maxTokenAccount;
   } else {
-    console.log('creating new token account');
+    console.log("creating new token account");
     const transaction = new Transaction();
     const aTokenAccountPubkey = (
       await PublicKey.findProgramAddress(
@@ -74,7 +68,7 @@ export async function findLargestTokenAccountForOwner(
           TOKEN_PROGRAM_ID.toBuffer(),
           mint.toBuffer(),
         ],
-        ASSOCIATED_TOKEN_PROGRAM_ID,
+        ASSOCIATED_TOKEN_PROGRAM_ID
       )
     )[0];
 
@@ -85,8 +79,8 @@ export async function findLargestTokenAccountForOwner(
         mint,
         aTokenAccountPubkey,
         owner.publicKey,
-        owner.publicKey,
-      ),
+        owner.publicKey
+      )
     );
     await connection.sendTransaction(transaction, [owner]);
     return {
@@ -98,7 +92,7 @@ export async function findLargestTokenAccountForOwner(
 }
 
 export async function getOwnedTokenAccounts(
-  provider: Provider,
+  provider: Provider
 ): Promise<TokenAccount[]> {
   const accounts = await provider.connection.getProgramAccounts(
     TOKEN_PROGRAM_ID,
@@ -106,7 +100,7 @@ export async function getOwnedTokenAccounts(
       filters: [
         {
           memcmp: {
-            offset: AccountLayout.offsetOf('owner'),
+            offset: AccountLayout.offsetOf("owner"),
             bytes: provider.wallet.publicKey.toBase58(),
           },
         },
@@ -114,7 +108,7 @@ export async function getOwnedTokenAccounts(
           dataSize: AccountLayout.span,
         },
       ],
-    },
+    }
   );
   return accounts.map((r) => {
     const tokenAccount = parseTokenAccount(r.account.data);
@@ -125,7 +119,7 @@ export async function getOwnedTokenAccounts(
 
 export async function fetchTokenAccount(
   provider: Provider,
-  address: PublicKey,
+  address: PublicKey
 ): Promise<AccountInfo> {
   const tokenAccount = await getTokenAccount(provider, address);
   tokenAccount.address = address;
@@ -134,13 +128,13 @@ export async function fetchTokenAccount(
 
 export async function createAssociatedTokenAccount(
   provider: Provider,
-  mint: PublicKey,
+  mint: PublicKey
 ): Promise<PublicKey> {
   const aTokenAddr = await Token.getAssociatedTokenAddress(
     ASSOCIATED_TOKEN_PROGRAM_ID,
     TOKEN_PROGRAM_ID,
     mint,
-    provider.wallet.publicKey,
+    provider.wallet.publicKey
   );
   console.log(`Creating token account for ${mint.toString()}`);
   await sendTransaction(
@@ -152,11 +146,11 @@ export async function createAssociatedTokenAccount(
         mint,
         aTokenAddr,
         provider.wallet.publicKey,
-        provider.wallet.publicKey,
+        provider.wallet.publicKey
       ),
     ],
     [],
-    true,
+    true
   );
   return aTokenAddr;
 }
@@ -165,7 +159,7 @@ export async function sendTransaction(
   provider: Provider,
   instructions: TransactionInstruction[],
   signers: Keypair[],
-  confirm?: boolean,
+  confirm?: boolean
 ): Promise<string> {
   let transaction = new Transaction({ feePayer: provider.wallet.publicKey });
 
@@ -173,7 +167,7 @@ export async function sendTransaction(
     transaction.add(instruction);
   });
   transaction.recentBlockhash = (
-    await provider.connection.getRecentBlockhash('singleGossip')
+    await provider.connection.getRecentBlockhash("singleGossip")
   ).blockhash;
 
   if (signers.length > 0) {
@@ -184,7 +178,7 @@ export async function sendTransaction(
   const rawTransaction = transaction.serialize();
   const options = {
     skipPreflight: true,
-    commitment: 'singleGossip',
+    commitment: "singleGossip",
   };
 
   if (!confirm) {
@@ -192,7 +186,7 @@ export async function sendTransaction(
   } else {
     return await sendAndConfirmRawTransaction(
       provider.connection,
-      rawTransaction,
+      rawTransaction
     );
   }
 }
@@ -200,7 +194,7 @@ export async function sendTransaction(
 export function defaultTokenAccount(
   address: PublicKey,
   owner: PublicKey,
-  mint: PublicKey,
+  mint: PublicKey
 ): TokenAccount {
   return {
     address,
