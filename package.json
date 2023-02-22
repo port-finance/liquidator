@@ -13,6 +13,7 @@
   },
   "devDependencies": {
     "@types/node": "^18.14.0",
+    "@types/big.js": "^6.1.2",
     "@typescript-eslint/eslint-plugin": "^5.2.0",
     "@typescript-eslint/parser": "^5.2.0",
     "eslint": "^8.1.0",
@@ -31,7 +32,6 @@
     "@solana/web3.js": "1.42.0",
     "@switchboard-xyz/solana.js": "^2.0.127",
     "@switchboard-xyz/switchboard-api": "^0.2.154",
-    "@types/big.js": "^6.1.2",
     "axios": "^0.21.1",
     "big.js": "^6.1.1",
     "bn.js": "5.2.1",

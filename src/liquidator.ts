@@ -58,7 +58,6 @@ async function runLiquidator() {
     fs.readFileSync(keyPairPath, "utf-8")
   ) as string;
 
-  console.log(`length: ${bs58.decode(bs58KeyPair)}`);
   const payer = Keypair.fromSecretKey(bs58.decode(bs58KeyPair));
 
   const provider = new Provider(connection, new Wallet(payer), {
@@ -75,7 +74,6 @@ async function runLiquidator() {
 
   while (true) {
     try {
-      console.log("begain liquidate process");
       const unhealthyObligations = await getUnhealthyObligations(connection);
       console.log(
         `Time: ${new Date()} - payer account ${payer.publicKey.toBase58()}, we have ${
