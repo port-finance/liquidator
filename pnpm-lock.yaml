@@ -35,7 +35,6 @@ dependencies:
   '@solana/web3.js': 1.42.0
   '@switchboard-xyz/solana.js': 2.0.127
   '@switchboard-xyz/switchboard-api': 0.2.201_typescript@4.9.5
-  '@types/big.js': 6.1.6
   axios: 0.21.4
   big.js: 6.2.1
   bn.js: 5.2.1
@@ -43,6 +42,7 @@ dependencies:
   buffer-layout: 1.2.2
 
 devDependencies:
+  '@types/big.js': 6.1.6
   '@types/node': 18.14.0
   '@typescript-eslint/eslint-plugin': 5.52.0_6cfvjsbua5ptj65675bqcn6oza
   '@typescript-eslint/parser': 5.52.0_7kw3g6rralp5ps6mg3uyzz6azm
@@ -622,7 +622,6 @@ packages:
 
   /@types/big.js/6.1.6:
     resolution: {integrity: sha512-0r9J+Zz9rYm2hOTwiMAVkm3XFQ4u5uTK37xrQMhc9bysn/sf/okzovWMYYIBMFTn/yrEZ11pusgLEaoarTlQbA==}
-    dev: false
 
   /@types/bn.js/5.1.1:
     resolution: {integrity: sha512-qNrYbZqMx0uJAfKnKclPh+dTwK33KfLHYqtyODwd5HnXOjnkhc4qgn3BrK6RWyGZm5+sIFE7Q7Vz6QQtJB7w7g==}
