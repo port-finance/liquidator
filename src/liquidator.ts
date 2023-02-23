@@ -6,8 +6,6 @@ import {
   AccountInfo,
   TransactionInstruction,
 } from "@solana/web3.js";
-import { homedir } from "os";
-import * as fs from "fs";
 import {
   createAssociatedTokenAccount,
   defaultTokenAccount,
