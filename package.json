@@ -12,8 +12,8 @@
     "lint:ci": "eslint src/**.ts --max-warnings=0 && prettier -c '{tests,src}/**/*.ts'"
   },
   "devDependencies": {
-    "@types/node": "^18.14.0",
     "@types/big.js": "^6.1.2",
+    "@types/node": "^18.14.0",
     "@typescript-eslint/eslint-plugin": "^5.2.0",
     "@typescript-eslint/parser": "^5.2.0",
     "eslint": "^8.1.0",
