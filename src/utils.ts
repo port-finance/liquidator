@@ -17,10 +17,11 @@ import { TransactionInstruction } from "@solana/web3.js";
 import { AccountInfo as TokenAccount } from "@solana/spl-token";
 import { getTokenAccount, parseTokenAccount } from "@project-serum/common";
 import { BN, Provider } from "@project-serum/anchor";
+import { PORT_ENV } from "./const";
 
 export function notify(content: string) {
-  if (process.env.WEBHOOK_URL) {
-    axios.post(process.env.WEBHOOK_URL, { text: content });
+  if (PORT_ENV.HEARTBEAT_WEBHOOK_URL) {
+    axios.post(PORT_ENV.HEARTBEAT_WEBHOOK_URL, { text: content });
   }
   console.log(content);
 }

@@ -8,34 +8,30 @@ To run the liquidator you will need:
 - Token accounts for each token in the reserve
 - Roughly equal dollar value for each token.
 
-### Setup
+### Deploy
 
-Make sure to edit the .env file to look something like this:
+Make sure to add the `~/.config/solana/id` file to look something like this, and run the command:
 
 ```
-export CLUSTER_URL="https://solana-api.projectserum.com"
-export KEYPAIR=~/.config/solana/id.json
-export PROGRAM_ID="Port7uDYB3wk6GJAw4KT1WpTeMtSu9bTcChBHkX2LfR"
-export CHECK_INTERVAL="5000.0"
+# cat ~/.config/solana/id
+KEYPAIR=YourBase58KeyPair
+ALERT_WEBHOOK_URL=
+HEARTBEAT_WEBHOOK_URL=
+
+# Run
+cd deploy
+./deploy.sh apply
 ```
 
 `CHECK_INTERVAL` is the amount of milliseconds to wait between querying users' loans
 
-### Run with yarn
+### Run with pnpm
 
 ```
-yarn install
-source .env
-yarn liquidator
+# Before run with pnpm locally, make sure you setup the environment variable correctly.
+pnpm install
+pnpm start
 ```
-
-### Run with Docker
-
-```
-docker-compose up --build -d
-```
-
-You must put your private key file **id.json** at the root level of this folder, or update the default volume value (in `docker-compose.yaml` file) from `./id.json` to the location of your private key file.
 
 ### Contribution
 

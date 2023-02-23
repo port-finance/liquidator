@@ -37,34 +37,23 @@ import {
   LAMPORT_DECIMAL,
   LIQUIDATOR_REDUCE_FACTOR,
   portEnv,
+  PORT_ENV,
   SOL_MINT as SOL_MINT_ID,
   STAKING_PROGRAM_ID,
 } from "./const";
 import { redeemCollateral, redeemRemainingCollaterals } from "./redeem";
 
 async function runLiquidator() {
-  // const clusterUrl =
-  //   process.env.CLUSTER_URL || "https://api.mainnet-beta.solana.com";
-  const clusterUrl =
-    process.env.CLUSTER_URL ||
-    "https://port-finance.rpcpool.com/385f15db-1967-4777-a05e-3c0ad9afd955";
-  const checkInterval = parseFloat(process.env.CHECK_INTERVAL || "8000.0");
+  const clusterUrl = PORT_ENV.CLUSTER_URL;
+  const checkInterval = PORT_ENV.CHECK_INTERVAL;
   const connection = new Connection(clusterUrl, "singleGossip");
 
   // The address of the Port Finance on the blockchain
-  const programId = new PublicKey(
-    process.env.PROGRAM_ID || "Port7uDYB3wk6GJAw4KT1WpTeMtSu9bTcChBHkX2LfR"
-  );
+  const programId = PORT_ENV.PROGRAM_ID;
 
   // liquidator's keypair
-  const keyPairPath =
-    process.env.KEYPAIR || `${homedir()}/.config/solana/id.json`;
-  const bs58KeyPair = JSON.parse(
-    fs.readFileSync(keyPairPath, "utf-8")
-  ) as string;
-
+  const bs58KeyPair = PORT_ENV.KEYPAIR;
   const payer = Keypair.fromSecretKey(bs58.decode(bs58KeyPair));
-
   const provider = new Provider(connection, new Wallet(payer), {
     preflightCommitment: "recent",
     commitment: "recent",

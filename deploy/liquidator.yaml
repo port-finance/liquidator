@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: port-liquidator
+  labels:
+    app: port-liquidator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: port-liquidator
+  template:
+    metadata:
+      labels:
+        app: port-liquidator
+    spec:
+      containers:
+        - name: port-liquidator
+          image: 854153369854.dkr.ecr.ap-southeast-1.amazonaws.com/port-liquidator:latest
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh"]
+          args: ["-c", "pnpm start"]
+          envFrom:
+            - secretRef:
+                name: env-secrets
