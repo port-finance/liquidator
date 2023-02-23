@@ -19,3 +19,18 @@ export const SWITCHBOARD_PROGRAM_V1 =
   "DtmE9D2CSB4L5D6A15mraeEjrGMm6auWVzgaD8hK2tZM";
 export const SWITCHBOARD_PROGRAM_V2 =
   "SW1TCH7qEPTdLsDHRgPuMQjbQxKdH2aBStViMFnt64f";
+
+export const PORT_ENV = (() => {
+  return {
+    HEARTBEAT_WEBHOOK_URL: process.env.HEARTBEAT_WEBHOOK_URL,
+    ALERT_WEBHOOK_URL: process.env.ALERT_WEBHOOK_URL,
+    KEYPAIR: JSON.parse(process.env.KEYPAIR!) as string,
+    PROGRAM_ID: new PublicKey(
+      process.env.PROGRAM_ID ?? "Port7uDYB3wk6GJAw4KT1WpTeMtSu9bTcChBHkX2LfR"
+    ),
+    CLUSTER_URL:
+      process.env.CLUSTER_URL ??
+      "https://port-finance.rpcpool.com/385f15db-1967-4777-a05e-3c0ad9afd955",
+    CHECK_INTERVAL: parseFloat(process.env.CHECK_INTERVAL || "8000"),
+  };
+})();
