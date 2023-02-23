@@ -3,6 +3,9 @@ kind: Kustomization
 
 namespace: port
 
+resources:
+  - liquidator.yaml
+
 commonLabels:
   release: port
 

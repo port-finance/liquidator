@@ -10,11 +10,11 @@ function ecr-auth() {
 }
 
 function build() {
-    docker build -f $PROJECT_DIR/Dockerfile -t $DOCKER_REGISTRY/port-api:$IMAGE_TAG $PROJECT_DIR/
+    docker build -f $PROJECT_DIR/Dockerfile -t $DOCKER_REGISTRY/port-liquidator:$IMAGE_TAG $PROJECT_DIR/
 }
 
 function push() {
-    build $1 && ecr-auth && docker push $DOCKER_REGISTRY/port-api:$IMAGE_TAG
+    build $1 && ecr-auth && docker push $DOCKER_REGISTRY/port-liquidator:$IMAGE_TAG
 }
 
 function apply() {
