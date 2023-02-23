@@ -209,7 +209,7 @@ async function liquidateUnhealthyObligation(
   const repayReserve: ReserveInfo = reserveContext.getReserve(
     repayLoan.getReserveId()
   );
-  const repayAmount = new u64(repayLoan.getAmount().getRaw().toString());
+  const repayAmount = repayLoan.toU64();
 
   const withdrawCollateral = collaterals.reduce((prev, cur) => {
     if (prev.getAmount().gt(cur.getAmount())) {
