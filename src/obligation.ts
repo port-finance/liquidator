@@ -11,7 +11,9 @@ import { EnrichedObligation } from "./types";
 import { DISPLAY_FIRST, portEnv, ZERO } from "./const";
 
 export async function getUnhealthyObligations(connection: Connection) {
-  const mainnetPort = Port.forMainNet({ connection: connection });
+  const mainnetPort = Port.forMainNet({
+    connection: connection,
+  });
   const portBalances = await mainnetPort.getAllPortProfiles();
   const reserves = await mainnetPort.getReserveContext();
   const tokenToCurrentPrice = await readTokenPrices(connection, reserves);
@@ -48,11 +50,11 @@ obligation pubkey: ${ob.obligation.getProfileId().toString()}
         .getAssetContext()
         .findConfigByReserveId(ReserveId.fromBase58(token))
         ?.getDisplayConfig()
-        .getName()} price: ${price.toString()}`
+        .getName()}, reserveId: ${token}, price: ${price.toString()}`
     );
   });
   console.log("\n");
-  return sortedObligations.filter((obligation) => obligation.riskFactor >= 1);
+  return sortedObligations.filter((obigation) => obigation.riskFactor >= 1);
 }
 
 function willNeverLiquidate(obligation: PortProfile): boolean {

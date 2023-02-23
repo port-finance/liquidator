@@ -18,11 +18,11 @@ import {
   sleep,
 } from "./utils";
 import { AccountLayout, Token, TOKEN_PROGRAM_ID, u64 } from "@solana/spl-token";
-import Big from "big.js";
 import { AccountInfo as TokenAccount } from "@solana/spl-token";
-import { Provider, Wallet } from "@project-serum/anchor";
+import { BN, Provider, Wallet } from "@project-serum/anchor";
 import {
   liquidateObligationInstruction,
+  Loan,
   Port,
   PortProfile,
   refreshObligationInstruction,
@@ -34,7 +34,13 @@ import {
 import * as bs58 from "bs58";
 import { EnrichedObligation } from "./types";
 import { getUnhealthyObligations } from "./obligation";
-import { portEnv, SOL_MINT as SOL_MINT_ID, STAKING_PROGRAM_ID } from "./const";
+import {
+  LAMPORT_DECIMAL,
+  LIQUIDATOR_REDUCE_FACTOR,
+  portEnv,
+  SOL_MINT as SOL_MINT_ID,
+  STAKING_PROGRAM_ID,
+} from "./const";
 import { redeemCollateral, redeemRemainingCollaterals } from "./redeem";
 
 async function runLiquidator() {
@@ -65,7 +71,9 @@ async function runLiquidator() {
     commitment: "recent",
   });
 
-  const portApi = Port.forMainNet({ connection: connection });
+  const portApi = Port.forMainNet({
+    connection: connection,
+  });
   console.log(`Port liquidator launched on cluster=${clusterUrl}`);
 
   const reserveContext = await portApi.getReserveContext();
@@ -74,6 +82,7 @@ async function runLiquidator() {
 
   while (true) {
     try {
+      console.log(`start fetching unhealthy obligations...`);
       const unhealthyObligations = await getUnhealthyObligations(connection);
       console.log(
         `Time: ${new Date()} - payer account ${payer.publicKey.toBase58()}, we have ${
@@ -86,8 +95,9 @@ async function runLiquidator() {
             .getProfileId()
             .toString()} which is owned by ${unhealthyObligation.obligation
             .getOwner()
-            ?.toBase58()} with risk factor: ${unhealthyObligation.riskFactor}
-which has borrowed ${unhealthyObligation.totalLoanValue} ...
+            ?.toBase58()} with risk factor: ${
+            unhealthyObligation.riskFactor
+          }, which has borrowed ${unhealthyObligation.totalLoanValue} ...
 `
         );
         await liquidateUnhealthyObligation(
@@ -146,33 +156,6 @@ async function prepareTokenAccounts(
   return wallets;
 }
 
-// eslint-disable-next-line
-function getTotalShareTokenCollateralized(
-  portBalances: PortProfile[]
-): Map<string, Big> {
-  const amounts = new Map();
-  amounts.set("total_amount", new Big(0));
-
-  portBalances.forEach((balance) => {
-    amounts.set(
-      "total_amount",
-      amounts.get("total_amount").add(balance.getDepositedValue())
-    );
-    balance.getCollaterals().forEach((collateral) => {
-      const reserveId = collateral.getReserveId().toString();
-      if (amounts.has(reserveId)) {
-        amounts.set(
-          reserveId,
-          amounts.get(reserveId).add(collateral.getAmount().getRaw()) //TODO: Test
-        );
-      } else {
-        amounts.set(reserveId, new Big(0));
-      }
-    });
-  });
-  return amounts;
-}
-
 async function liquidateUnhealthyObligation(
   provider: Provider,
   programId: PublicKey,
@@ -216,50 +199,38 @@ async function liquidateUnhealthyObligation(
 
   const loans = obligation.obligation.getLoans();
   const collaterals = obligation.obligation.getCollaterals();
-  let repayReserveId: ReserveId | null = null;
 
-  for (const loan of loans) {
-    const reserve = reserveContext.getReserve(loan.getReserveId());
-
-    if (
-      reserve.getAssetMintId().toString() === SOL_MINT_ID && //TODO: test
-      payerAccount.lamports > 0
-    ) {
-      repayReserveId = loan.getReserveId();
-      break;
+  const repayLoan = loans.reduce((prev, cur) => {
+    if (prev.getAmount().gt(cur.getAmount())) {
+      return prev;
     }
-
-    const tokenWallet = wallets.get(reserve.getAssetMintId().toString()); // TODO: test
-    if (!tokenWallet?.amount.isZero()) {
-      repayReserveId = loan.getReserveId();
-      break;
-    }
-  }
-
-  if (repayReserveId === null) {
-    throw new Error(
-      `No token to repay at risk obligation: ${obligation.obligation
-        .getId()
-        .toString()}`
-    );
-  }
-
-  const repayReserve: ReserveInfo = reserveContext.getReserve(repayReserveId);
-  // TODO: choose a smarter way to withdraw collateral
-  const withdrawReserve: ReserveInfo = reserveContext.getReserve(
-    collaterals[0].getReserveId()
+    return cur;
+  });
+  const repayReserve: ReserveInfo = reserveContext.getReserve(
+    repayLoan.getReserveId()
   );
+  const repayAmount = new u64(repayLoan.getAmount().getRaw().toString());
 
-  if (!repayReserve || !withdrawReserve) {
-    return;
-  }
+  const withdrawCollateral = collaterals.reduce((prev, cur) => {
+    if (prev.getAmount().gt(cur.getAmount())) {
+      return prev;
+    }
+    return cur;
+  });
+  const withdrawReserve = reserveContext.getReserve(
+    withdrawCollateral.getReserveId()
+  );
 
   if (
     repayReserve.getAssetMintId().toString() !== SOL_MINT_ID &&
     (!wallets.has(repayReserve.getAssetMintId().toString()) ||
       !wallets.has(withdrawReserve.getShareMintId().toString()))
   ) {
-    return;
+    throw Error(
+      `No required wallet exists, required ${repayReserve
+        .getAssetMintId()
+        .toString()} and ${withdrawReserve.getShareMintId().toString()}`
+    );
   }
 
   const repayWallet = wallets.get(repayReserve.getAssetMintId().toString());
@@ -276,10 +247,19 @@ async function liquidateUnhealthyObligation(
   );
 
   if (repayReserve.getAssetMintId().toString() !== SOL_MINT_ID) {
+    const realAmount = u64.min(
+      repayAmount,
+      latestRepayWallet.amount.mul(new u64(LIQUIDATOR_REDUCE_FACTOR))
+    );
+    if (realAmount.lte(new u64(0))) {
+      throw Error(
+        `liquidate by paying token: liquidate amount invalid ${realAmount.toString()}`
+      );
+    }
     await liquidateByPayingToken(
       provider,
       instructions,
-      latestRepayWallet.amount,
+      realAmount,
       repayWallet.address,
       withdrawWallet.address,
       repayReserve,
@@ -289,11 +269,21 @@ async function liquidateUnhealthyObligation(
       lendingMarketAuthority
     );
   } else {
+    const availableAmount = new u64(payerAccount.lamports - LAMPORT_DECIMAL);
+    const realAmount = repayAmount.gt(availableAmount)
+      ? u64.min(repayAmount.div(new u64(2)).add(new u64(1)), availableAmount)
+      : repayAmount;
+
+    if (realAmount.lte(new u64(0))) {
+      throw Error(
+        `liquidate by paying SOL: liquidate amount invalid ${realAmount.toString()}`
+      );
+    }
     await liquidateByPayingSOL(
       provider,
       instructions,
       signers,
-      new u64(payerAccount.lamports - 100_000_000),
+      realAmount,
       withdrawWallet.address,
       repayReserve,
       withdrawReserve,
@@ -440,9 +430,7 @@ async function liquidateByPayingToken(
 ): Promise<void> {
   const stakeAccounts = await fetchStakingAccounts(
     provider.connection,
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     obligation.getOwner()!,
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     withdrawReserve.getStakingPoolId()!
   );
 
