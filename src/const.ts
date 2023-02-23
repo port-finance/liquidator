@@ -24,7 +24,7 @@ export const PORT_ENV = (() => {
   return {
     HEARTBEAT_WEBHOOK_URL: process.env.HEARTBEAT_WEBHOOK_URL,
     ALERT_WEBHOOK_URL: process.env.ALERT_WEBHOOK_URL,
-    KEYPAIR: JSON.parse(process.env.KEYPAIR!) as string,
+    KEYPAIR: process.env.KEYPAIR!,
     PROGRAM_ID: new PublicKey(
       process.env.PROGRAM_ID ?? "Port7uDYB3wk6GJAw4KT1WpTeMtSu9bTcChBHkX2LfR"
     ),
