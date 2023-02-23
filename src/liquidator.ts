@@ -19,10 +19,9 @@ import {
 } from "./utils";
 import { AccountLayout, Token, TOKEN_PROGRAM_ID, u64 } from "@solana/spl-token";
 import { AccountInfo as TokenAccount } from "@solana/spl-token";
-import { BN, Provider, Wallet } from "@project-serum/anchor";
+import { Provider, Wallet } from "@project-serum/anchor";
 import {
   liquidateObligationInstruction,
-  Loan,
   Port,
   PortProfile,
   refreshObligationInstruction,
