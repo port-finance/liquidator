@@ -1,0 +1,23 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: port
+
+resources:
+  - liquidator.yaml
+
+commonLabels:
+  release: port
+
+secretGenerator:
+  - name: port-liquidator-secret
+    envs:
+      - $HOME/.config/solana/id
+    literals:
+      - CLUSTER_URL=https://port-finance.rpcpool.com/385f15db-1967-4777-a05e-3c0ad9afd955
+      # - CLUSTER_URL=https://api.mainnet-beta.solana.com
+      # - CLUSTER_URL=https://solana-api.projectserum.com
+      - PROGRAM_ID=Port7uDYB3wk6GJAw4KT1WpTeMtSu9bTcChBHkX2LfR
+      - CHECK_INTERVAL=15000
+    options:
+      disableNameSuffixHash: true
