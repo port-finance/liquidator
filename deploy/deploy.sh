@@ -1,3 +1,5 @@
+#!/bin/bash
+
 dir=$(dirname $(realpath $0))
 
 IMAGE_TAG="latest"
@@ -18,9 +20,9 @@ function push() {
 }
 
 function apply() {
-    sed -i 's@$HOME@'$HOME'@g' kustomization.yaml
-    kustomize build --load-restrictor LoadRestrictionsNone . |  kubectl apply -f -
-    sed -i 's@'$HOME'@$HOME@g' kustomization.yaml
+    sed -i 's@$HOME@'$HOME'@g' $dir/kustomization.yaml
+    kustomize build --load-restrictor LoadRestrictionsNone $dir |  kubectl apply -f -
+    sed -i 's@'$HOME'@$HOME@g' $dir/kustomization.yaml
 }
 
 case "$1" in

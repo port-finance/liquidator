@@ -18,8 +18,6 @@ spec:
         - name: port-liquidator
           image: 854153369854.dkr.ecr.ap-southeast-1.amazonaws.com/port-liquidator:latest
           imagePullPolicy: IfNotPresent
-          command: ["/bin/sh"]
-          args: ["-c", "pnpm start"]
           envFrom:
             - secretRef:
-                name: env-secrets
+                name: port-liquidator-secret
