@@ -8,7 +8,7 @@ To run the liquidator you will need:
 - Token accounts for each token in the reserve
 - Roughly equal dollar value for each token.
 
-### Deploy
+### Deploy to K8s Cluster
 
 Make sure to add the `~/.config/solana/id` file to look something like this, and run the command:
 
