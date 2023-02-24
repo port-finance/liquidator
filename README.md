@@ -13,10 +13,12 @@ To run the liquidator you will need:
 Make sure to add the `~/.config/solana/id` file to look something like this, and run the command:
 
 ```
+# URL is optional (For alert message)
 # cat ~/.config/solana/id
 KEYPAIR=YourBase58KeyPair
 ALERT_WEBHOOK_URL=
 HEARTBEAT_WEBHOOK_URL=
+BALANCE_WEBHOOK_URL=
 
 # Run
 cd deploy
