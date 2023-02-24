@@ -1,4 +1,7 @@
 .git
+./node_modules/
+./dist/
+./deploy/
 
 docker-compose.yaml
 Dockerfile

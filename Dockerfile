@@ -1,19 +1,14 @@
 # Builder
-FROM node:alpine3.14 as builder
+ARG VARIANT=18-bullseye
+FROM mcr.microsoft.com/vscode/devcontainers/javascript-node:0-${VARIANT} as builder
+WORKDIR /liquidator
+RUN su node -c "npm install -g pnpm ts-node" && \
+    pnpm config set store-dir /tmp/.pnpm-store
+COPY . .
+RUN pnpm install && pnpm build
 
-RUN mkdir -p /app
-WORKDIR /app
-
-COPY . ./
-RUN yarn install
-
-# Runner
-FROM node:alpine3.14
-
-USER node
-
-COPY --from=builder /app /app
-
-WORKDIR /app
-
-ENTRYPOINT [ "yarn", "liquidator" ]
+ARG VARIANT=18-bullseye
+FROM node:${VARIANT}-slim as production
+COPY --from=builder /liquidator/dist /liquidator/dist
+WORKDIR /liquidator/
+CMD [ "/liquidator/dist/liquidator.cjs" ]
