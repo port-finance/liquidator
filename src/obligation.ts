@@ -5,10 +5,11 @@ import {
   ReserveId,
 } from "@port.finance/port-sdk";
 import { Connection } from "@solana/web3.js";
-import { readTokenPrices } from "./price";
+import { readReservePrices } from "./price";
 import Big from "big.js";
 import { EnrichedObligation } from "./types";
 import { DISPLAY_FIRST, portEnv, ZERO } from "./const";
+import { log } from "./infra/logger";
 
 export async function getUnhealthyObligations(connection: Connection) {
   const mainnetPort = Port.forMainNet({
@@ -16,7 +17,7 @@ export async function getUnhealthyObligations(connection: Connection) {
   });
   const portBalances = await mainnetPort.getAllPortProfiles();
   const reserves = await mainnetPort.getReserveContext();
-  const tokenToCurrentPrice = await readTokenPrices(connection, reserves);
+  const tokenToCurrentPrice = await readReservePrices(connection, reserves);
   const sortedObligations = portBalances
     .filter((obligation) => !isNoBorrow(obligation))
     .filter((obligation) => !willNeverLiquidate(obligation))
@@ -28,32 +29,30 @@ export async function getUnhealthyObligations(connection: Connection) {
       return obligation2.riskFactor * 100 - obligation1.riskFactor * 100;
     });
 
-  console.log(
-    `
-Total number of loans are ${portBalances.length} and possible liquidation debts are ${sortedObligations.length}
-`
+  log.common.info(
+    `Total number of loans are ${portBalances.length} and possible liquidation debts are ${sortedObligations.length}`
   );
+
   sortedObligations.slice(0, DISPLAY_FIRST).forEach((ob) =>
-    console.log(
-      `Risk factor: ${ob.riskFactor.toFixed(4)} borrowed amount: ${
-        ob.totalLoanValue
-      } liquidation loan value amount: ${ob.totalLiquidationLoanValue}
+    log.common.info(`Risk factor: ${ob.riskFactor.toFixed(
+      4
+    )} borrowed amount: ${ob.totalLoanValue} liquidation loan value amount: ${
+      ob.totalLiquidationLoanValue
+    }
 borrowed asset names: [${ob.loanAssetNames.toString()}] deposited asset names: [${ob.depositedAssetNames.toString()}]
-obligation pubkey: ${ob.obligation.getProfileId().toString()}
-`
-    )
+obligation pubkey: ${ob.obligation.getProfileId().toString()}`)
   );
 
   tokenToCurrentPrice.forEach((price: Big, token: string) => {
-    console.log(
+    log.common.info(
       `name: ${portEnv
         .getAssetContext()
         .findConfigByReserveId(ReserveId.fromBase58(token))
         ?.getDisplayConfig()
-        .getName()}, reserveId: ${token}, price: ${price.toString()}`
+        .getName()}, reserveId: ${token}, price: ${price.toString()}\n`
     );
   });
-  console.log("\n");
+
   return sortedObligations.filter((obigation) => obigation.riskFactor >= 1);
 }
 

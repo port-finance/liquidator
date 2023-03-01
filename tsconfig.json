@@ -9,6 +9,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
+    "strictPropertyInitialization": false,
     "moduleResolution": "node",
     "outDir": "./dist",
     "allowJs": true,

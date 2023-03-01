@@ -11,7 +11,9 @@ import {
   Token,
   TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
-import { fetchTokenAccount, sendTransaction } from "./utils";
+import { sendTransaction } from "./utils";
+import { fetchTokenAccount } from "./account";
+import { log } from "./infra/logger";
 
 export async function redeemRemainingCollaterals(
   provider: Provider,
@@ -51,7 +53,7 @@ export async function redeemRemainingCollaterals(
         );
       }
     } catch (e) {
-      console.log(e);
+      log.alert.info(e);
     }
   });
 }
