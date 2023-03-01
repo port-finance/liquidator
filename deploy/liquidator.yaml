@@ -17,7 +17,14 @@ spec:
       containers:
         - name: port-liquidator
           image: 854153369854.dkr.ecr.ap-southeast-1.amazonaws.com/port-liquidator:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           envFrom:
             - secretRef:
                 name: port-liquidator-secret
+          volumeMounts:
+            - mountPath: /opt/port/
+              name: liquidator-conf
+      volumes:
+        - name: liquidator-conf
+          configMap:
+            name: port-liquidator-config

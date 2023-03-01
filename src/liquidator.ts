@@ -3,18 +3,9 @@ import {
   Connection,
   PublicKey,
   SystemProgram,
-  AccountInfo,
   TransactionInstruction,
 } from "@solana/web3.js";
-import {
-  createAssociatedTokenAccount,
-  defaultTokenAccount,
-  fetchTokenAccount,
-  getOwnedTokenAccounts,
-  notify,
-  sendTransaction,
-  sleep,
-} from "./utils";
+import { sendTransaction, sleep } from "./utils";
 import { AccountLayout, Token, TOKEN_PROGRAM_ID, u64 } from "@solana/spl-token";
 import { AccountInfo as TokenAccount } from "@solana/spl-token";
 import { Provider, Wallet } from "@project-serum/anchor";
@@ -37,9 +28,14 @@ import {
   portEnv,
   PORT_ENV,
   SOL_MINT as SOL_MINT_ID,
-  STAKING_PROGRAM_ID,
 } from "./const";
 import { redeemCollateral, redeemRemainingCollaterals } from "./redeem";
+import {
+  fetchStakingAccounts,
+  fetchTokenAccount,
+  prepareTokenAccounts,
+} from "./account";
+import { log } from "./infra/logger";
 
 async function runLiquidator() {
   const clusterUrl = PORT_ENV.CLUSTER_URL;
@@ -60,7 +56,7 @@ async function runLiquidator() {
   const portApi = Port.forMainNet({
     connection: connection,
   });
-  console.log(`Port liquidator launched on cluster=${clusterUrl}`);
+  log.common.info(`Port liquidator launched on cluster=${clusterUrl}`);
 
   const reserveContext = await portApi.getReserveContext();
 
@@ -68,24 +64,26 @@ async function runLiquidator() {
 
   while (true) {
     try {
-      console.log(`start fetching unhealthy obligations...`);
+      log.common.info(`start fetching unhealthy obligations...`);
       const unhealthyObligations = await getUnhealthyObligations(connection);
-      console.log(
-        `Time: ${new Date()} - payer account ${payer.publicKey.toBase58()}, we have ${
+      log.common.info(
+        `payer account ${payer.publicKey.toBase58()}, we have ${
           unhealthyObligations.length
-        } accounts for liquidation`
+        } accounts for liquidation
+`
       );
+
       for (const unhealthyObligation of unhealthyObligations) {
-        notify(
+        log.common.info(
           `Liquidating obligation account ${unhealthyObligation.obligation
             .getProfileId()
             .toString()} which is owned by ${unhealthyObligation.obligation
             .getOwner()
             ?.toBase58()} with risk factor: ${
             unhealthyObligation.riskFactor
-          }, which has borrowed ${unhealthyObligation.totalLoanValue} ...
-`
+          }, which has borrowed ${unhealthyObligation.totalLoanValue} ...`
         );
+
         await liquidateUnhealthyObligation(
           provider,
           programId,
@@ -102,44 +100,12 @@ async function runLiquidator() {
         );
       }
     } catch (e) {
-      notify(`unknown error: ${e}`);
-      console.error("error: ", e);
+      log.alert.info(`unknown error: ${e}`);
     } finally {
       await sleep(checkInterval);
     }
     // break;
   }
-}
-
-async function prepareTokenAccounts(
-  provider: Provider,
-  reserveContext: ReserveContext
-): Promise<Map<string, TokenAccount>> {
-  const wallets: Map<string, TokenAccount> = new Map<string, TokenAccount>();
-
-  const tokenAccounts = await getOwnedTokenAccounts(provider);
-  for (const tokenAccount of tokenAccounts) {
-    wallets.set(tokenAccount.mint.toString(), tokenAccount);
-  }
-
-  const mintIds: PublicKey[] = reserveContext
-    .getAllReserves()
-    .flatMap((reserve) => [reserve.getAssetMintId(), reserve.getShareMintId()]);
-
-  for (const mintId of mintIds) {
-    if (!wallets.has(mintId.toString())) {
-      const aTokenAddress = await createAssociatedTokenAccount(
-        provider,
-        mintId
-      );
-      wallets.set(
-        mintId.toString(),
-        defaultTokenAccount(aTokenAddress, provider.wallet.publicKey, mintId)
-      );
-    }
-  }
-
-  return wallets;
 }
 
 async function liquidateUnhealthyObligation(
@@ -213,7 +179,7 @@ async function liquidateUnhealthyObligation(
       !wallets.has(withdrawReserve.getShareMintId().toString()))
   ) {
     throw Error(
-      `No required wallet exists, required ${repayReserve
+      `No required wallet asset exists, required ${repayReserve
         .getAssetMintId()
         .toString()} and ${withdrawReserve.getShareMintId().toString()}`
     );
@@ -289,8 +255,8 @@ async function liquidateUnhealthyObligation(
     .findConfigByReserveId(withdrawReserve.getReserveId())
     ?.getDisplayConfig()
     .getName();
-  console.log(
-    `Liqudiation transaction sent: ${liquidationSig}, paying ${repayTokenName} for ${withdrawTokenName}.`
+  log.common.warn(
+    `Liqudiation transaction sent successfule: ${liquidationSig}, paying ${repayTokenName} for ${withdrawTokenName}.`
   );
 
   const latestCollateralWallet = await fetchTokenAccount(
@@ -308,7 +274,7 @@ async function liquidateUnhealthyObligation(
     lendingMarketAuthority
   );
 
-  console.log(
+  log.common.warn(
     `Redeemed ${latestCollateralWallet.amount.toString()} lamport of ${withdrawTokenName} collateral tokens: ${redeemSig}`
   );
 }
@@ -366,40 +332,6 @@ async function liquidateByPayingSOL(
   );
 
   signers.push(wrappedSOLTokenAccount);
-}
-
-async function fetchStakingAccounts(
-  connection: Connection,
-  owner: PublicKey,
-  stakingPool: PublicKey | null
-): Promise<
-  Array<{
-    pubkey: PublicKey;
-    account: AccountInfo<Buffer>;
-  }>
-> {
-  if (stakingPool === null) {
-    return [];
-  }
-  return await connection.getProgramAccounts(STAKING_PROGRAM_ID, {
-    filters: [
-      {
-        dataSize: 233,
-      },
-      {
-        memcmp: {
-          offset: 1 + 16,
-          bytes: owner.toBase58(),
-        },
-      },
-      {
-        memcmp: {
-          offset: 1 + 16 + 32,
-          bytes: stakingPool.toBase58(),
-        },
-      },
-    ],
-  });
 }
 
 async function liquidateByPayingToken(

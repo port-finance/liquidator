@@ -9,6 +9,13 @@ resources:
 commonLabels:
   release: port
 
+configMapGenerator:
+  - name: port-liquidator-config
+    files:
+      - ../config/liquidator.json
+    options:
+      disableNameSuffixHash: true
+
 secretGenerator:
   - name: port-liquidator-secret
     envs:
@@ -19,5 +26,6 @@ secretGenerator:
       # - CLUSTER_URL=https://solana-api.projectserum.com
       - PROGRAM_ID=Port7uDYB3wk6GJAw4KT1WpTeMtSu9bTcChBHkX2LfR
       - CHECK_INTERVAL=15000
+      - CONFIG_FILE=/opt/port/liquidator.json
     options:
       disableNameSuffixHash: true
