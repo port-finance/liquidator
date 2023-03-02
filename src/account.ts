@@ -2,7 +2,6 @@ import { AnchorProvider, BN } from "@project-serum/anchor";
 import { ReserveContext } from "@port.finance/port-sdk";
 import {
   AccountInfo as TokenAccount,
-  AccountLayout,
   ASSOCIATED_TOKEN_PROGRAM_ID,
   Token,
   TOKEN_PROGRAM_ID,
@@ -13,16 +12,22 @@ import {
   AccountInfo,
   Keypair,
   Transaction,
+  ParsedAccountData,
 } from "@solana/web3.js";
 import { STAKING_PROGRAM_ID } from "./const";
-import { parseTokenAccount, sendTransaction } from "./utils";
+import {
+  parseTokenAccountFromBuf,
+  sendTransaction,
+  parseTokenAccount,
+} from "./utils";
 import { log } from "./infra/logger";
+import { TokenAccountDetail } from "./types";
 
 export async function prepareTokenAccounts(
   provider: AnchorProvider,
   reserveContext: ReserveContext
-): Promise<Map<string, TokenAccount>> {
-  const wallets: Map<string, TokenAccount> = new Map<string, TokenAccount>();
+): Promise<Map<string, TokenAccountDetail>> {
+  const wallets: Map<string, TokenAccountDetail> = new Map();
 
   const tokenAccounts = await getOwnedTokenAccounts(
     provider.connection,
@@ -101,7 +106,7 @@ export async function findLargestTokenAccountForOwner(
   let maxPubkey: null | PublicKey = null;
 
   for (const { pubkey, account } of response.value) {
-    const tokenAccount = parseTokenAccount(account, pubkey);
+    const tokenAccount = parseTokenAccountFromBuf(account, pubkey);
     if (tokenAccount.amount.gt(max)) {
       maxTokenAccount = tokenAccount;
       max = tokenAccount.amount;
@@ -148,36 +153,25 @@ export async function findLargestTokenAccountForOwner(
 export async function getOwnedTokenAccounts(
   conn: Connection,
   walllet: PublicKey
-): Promise<TokenAccount[]> {
-  const accounts = await conn.getProgramAccounts(TOKEN_PROGRAM_ID, {
-    filters: [
-      {
-        memcmp: {
-          offset: AccountLayout.offsetOf("owner"),
-          bytes: walllet.toBase58(),
-        },
-      },
-      {
-        dataSize: AccountLayout.span,
-      },
-    ],
+) {
+  const accounts = await conn.getParsedTokenAccountsByOwner(walllet, {
+    programId: TOKEN_PROGRAM_ID,
   });
-  return accounts.map((r) => {
-    const tokenAccount = parseTokenAccount(r.account, r.pubkey);
-    tokenAccount.address = r.pubkey;
+  return accounts.value.map((r) => {
+    const tokenAccount = parseTokenAccount(r.pubkey, r.account);
     return tokenAccount;
   });
 }
 
-export async function fetchTokenAccount(
-  conn: Connection,
-  address: PublicKey
-): Promise<TokenAccount> {
-  const account = await conn.getAccountInfo(address);
-  if (!account) {
+export async function fetchTokenAccount(conn: Connection, address: PublicKey) {
+  const account = await conn.getParsedAccountInfo(address);
+  if (!account || !account.value) {
     throw Error(`Token account not found: ${address.toString()}`);
   }
-  const tokenAccount = parseTokenAccount(account, address);
+  const tokenAccount = parseTokenAccount(
+    address,
+    account.value as AccountInfo<ParsedAccountData>
+  );
   return tokenAccount;
 }
 
@@ -214,11 +208,19 @@ export function defaultTokenAccount(
   address: PublicKey,
   owner: PublicKey,
   mint: PublicKey
-): TokenAccount {
+): TokenAccountDetail {
   return {
     address,
     owner,
     mint,
+    isNative: false,
+    state: "",
     amount: new BN(0),
-  } as TokenAccount;
+    tokenAmount: {
+      amount: new BN(0),
+      decimals: 0,
+      uiAmount: 0,
+      uiAmountString: "",
+    },
+  };
 }

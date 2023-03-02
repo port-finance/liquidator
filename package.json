@@ -29,7 +29,7 @@
     "@project-serum/serum": "^0.13.41",
     "@pythnetwork/client": "^2.2.0",
     "@solana/spl-token": "0.1.8",
-    "@solana/web3.js": "1.42.0",
+    "@solana/web3.js": "1.73.3",
     "@switchboard-xyz/solana.js": "^2.0.127",
     "@switchboard-xyz/switchboard-api": "^0.2.154",
     "@solana/buffer-layout": "^4.0.0",

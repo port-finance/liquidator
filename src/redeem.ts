@@ -6,20 +6,17 @@ import {
 } from "@port.finance/port-sdk";
 import { AnchorProvider } from "@project-serum/anchor";
 import { Keypair, PublicKey, TransactionInstruction } from "@solana/web3.js";
-import {
-  AccountInfo as TokenAccount,
-  Token,
-  TOKEN_PROGRAM_ID,
-} from "@solana/spl-token";
+import { Token, TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { sendTransaction } from "./utils";
 import { fetchTokenAccount } from "./account";
 import { log } from "./infra/logger";
+import { TokenAccountDetail } from "./types";
 
 export async function redeemRemainingCollaterals(
   provider: AnchorProvider,
   programId: PublicKey,
   reserveContext: ReserveContext,
-  wallets: Map<string, TokenAccount>
+  wallets: Map<string, TokenAccountDetail>
 ) {
   const lendingMarket: PublicKey = reserveContext
     .getAllReserves()[0]
@@ -60,7 +57,7 @@ export async function redeemRemainingCollaterals(
 
 export async function redeemCollateral(
   provider: AnchorProvider,
-  wallets: Map<string, TokenAccount>,
+  wallets: Map<string, TokenAccountDetail>,
   withdrawReserve: ReserveInfo,
   lendingMarketAuthority: PublicKey
 ): Promise<string> {

@@ -5,13 +5,15 @@ import {
   AccountInfo,
   PublicKey,
   TransactionInstruction,
+  ParsedAccountData,
 } from "@solana/web3.js";
-import { AnchorProvider } from "@project-serum/anchor";
+import { AnchorProvider, BN } from "@project-serum/anchor";
 import {
   AccountInfo as TokenAccount,
   AccountLayout,
   u64,
 } from "@solana/spl-token";
+import { TokenAccountDetail } from "./types";
 
 export function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -57,7 +59,7 @@ export async function sendTransaction(
   }
 }
 
-export const parseTokenAccount = (
+export const parseTokenAccountFromBuf = (
   info: AccountInfo<Buffer>,
   address: PublicKey
 ): TokenAccount => {
@@ -68,7 +70,10 @@ export const parseTokenAccount = (
     mint: new PublicKey(rawAccount.mint),
     owner: new PublicKey(rawAccount.owner),
     amount: u64.fromBuffer(rawAccount.amount),
-    delegate: rawAccount.delegateOption === 0 ? rawAccount.delegate : null,
+    delegate:
+      rawAccount.delegateOption === 0
+        ? new PublicKey(rawAccount.delegate)
+        : null,
     delegatedAmount:
       rawAccount.delegateOption === 0
         ? new u64(0)
@@ -84,5 +89,27 @@ export const parseTokenAccount = (
     closeAuthority: rawAccount.closeAuthorityOption
       ? new PublicKey(rawAccount.closeAuthority)
       : null,
+  };
+};
+
+export const parseTokenAccount = (
+  address: PublicKey,
+  info: AccountInfo<ParsedAccountData>
+): TokenAccountDetail => {
+  const { data } = info;
+  const detailInfo = data.parsed["info"];
+  return {
+    address,
+    isNative: detailInfo["isNative"],
+    mint: new PublicKey(detailInfo["mint"]),
+    owner: new PublicKey(detailInfo["owner"]),
+    state: detailInfo["state"],
+    amount: new BN(detailInfo["tokenAmount"]["amount"]),
+    tokenAmount: {
+      amount: new BN(detailInfo["tokenAmount"]["amount"]),
+      decimals: detailInfo["tokenAmount"]["decimals"],
+      uiAmount: detailInfo["tokenAmount"]["uiAmount"],
+      uiAmountString: detailInfo["tokenAmount"]["uiAmountString"],
+    },
   };
 };
