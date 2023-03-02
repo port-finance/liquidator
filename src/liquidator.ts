@@ -7,7 +7,6 @@ import {
 } from "@solana/web3.js";
 import { sendTransaction, sleep } from "./utils";
 import { AccountLayout, Token, TOKEN_PROGRAM_ID, u64 } from "@solana/spl-token";
-import { AccountInfo as TokenAccount } from "@solana/spl-token";
 import { AnchorProvider, Wallet } from "@project-serum/anchor";
 import {
   liquidateObligationInstruction,
@@ -20,7 +19,7 @@ import {
   ReserveInfo,
 } from "@port.finance/port-sdk";
 import * as bs58 from "bs58";
-import { EnrichedObligation } from "./types";
+import { EnrichedObligation, TokenAccountDetail } from "./types";
 import { getUnhealthyObligations } from "./obligation";
 import {
   LAMPORT_DECIMAL,
@@ -122,7 +121,7 @@ async function liquidateUnhealthyObligation(
   programId: PublicKey,
   obligation: EnrichedObligation,
   reserveContext: ReserveContext,
-  wallets: Map<string, TokenAccount>
+  wallets: Map<string, TokenAccountDetail>
 ) {
   const payerAccount = await provider.connection.getAccountInfo(
     provider.wallet.publicKey

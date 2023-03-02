@@ -41,45 +41,33 @@ export const rebalanceCoins = async (
 ) => {
   const coinPrice = await getTokenPrices(
     conn,
-    await portSDK.getReserveContext()
+    await portSDK.getReserveContext(),
+    portSDK.environment.getAssetContext()
   );
   const solBalance = Big(await conn.getBalance(wallet)).div(LAMPORT_DECIMAL);
-  const tokensBalance = new Map(
-    await (
-      await getOwnedTokenAccounts(conn, wallet)
-    ).map((tokenAccount) => {
+  const tokensBalance = Object.fromEntries(
+    (await getOwnedTokenAccounts(conn, wallet)).map((tokenAccount) => {
       return [
         tokenAccount.mint.toString(),
-        Big(tokenAccount.amount.toString()),
+        {
+          balance: Big(tokenAccount.amount.toString()).div(
+            Big(10).pow(tokenAccount.tokenAmount.decimals)
+          ),
+          decimal: Big(10).pow(tokenAccount.tokenAmount.decimals),
+        },
       ];
     })
   );
-  tokensBalance.set(SOL_MINT, solBalance);
+  tokensBalance[SOL_MINT] = {
+    balance: solBalance,
+    decimal: Big(LAMPORT_DECIMAL),
+  };
 
-  const aggCoinInfo = new Map(
-    Array.from(tokensBalance.entries())
-      .map(([mint, amount]) => {
-        const price = coinPrice.get[mint];
-        if (!price) {
-          return undefined;
-        }
-        return [
-          mint,
-          {
-            value: amount.mul(price),
-            amount: amount,
-            price: price,
-          },
-        ];
-      })
-      .filter(
-        (val): val is [string, { value: Big; amount: Big; price: Big }] => !!val
-      )
-  );
+  const aggCoinInfo = getAggCoinInfo(tokensBalance, coinPrice);
 
   const { stableCoin, valueRatios } = await loadPositionConfig(portSDK);
   const getCoinValueTarget = await (async () => {
-    const totalValue = Array.from(aggCoinInfo.values()).reduce(
+    const totalValue = Array.from(Object.values(aggCoinInfo)).reduce(
       (acc, { value }) => acc.add(value),
       Big(0)
     );
@@ -95,9 +83,9 @@ export const rebalanceCoins = async (
   // slippage tolerence 0.01%
   const slippageBps = 100;
   const getCoinSwapOption = async (coinType: string) => {
-    const coinInfo = aggCoinInfo.get(coinType);
+    const coinInfo = aggCoinInfo[coinType];
     const valueTarget = getCoinValueTarget(coinType);
-    if (coinInfo === undefined || valueTarget === undefined) {
+    if (valueTarget === undefined) {
       return null;
     }
 
@@ -112,12 +100,16 @@ export const rebalanceCoins = async (
     const [fromCoinType, toCoinType] = coinValueToChange.gt(0)
       ? [stableCoin, coinType]
       : [coinType, stableCoin];
+    const inputAmount = coinValueToChange
+      .abs()
+      .mul(aggCoinInfo[fromCoinType].decimal)
+      .div(aggCoinInfo[fromCoinType].price)
+      .round(undefined, 0);
 
-    // BUY
     return {
-      input: fromCoinType,
-      output: toCoinType,
-      amount: coinValueToChange.abs().div(coinInfo.price),
+      inputMint: fromCoinType,
+      outputMint: toCoinType,
+      inputAmount: inputAmount,
     };
   };
 
@@ -129,7 +121,7 @@ export const rebalanceCoins = async (
         coinType: t,
         diffUSD:
           valueTarget !== undefined
-            ? valueTarget.minus(aggCoinInfo.get(t)?.value ?? 0)
+            ? valueTarget.minus(aggCoinInfo[t].value)
             : null,
       };
     })
@@ -142,19 +134,69 @@ export const rebalanceCoins = async (
     if (payload) {
       try {
         const res = await jupiterSwap.swapWithBestRoute(
-          new PublicKey(payload.input),
-          new PublicKey(payload.output),
-          payload.amount,
+          new PublicKey(payload.inputMint),
+          new PublicKey(payload.outputMint),
+          payload.inputAmount,
           slippageBps
         );
         log.trace.warn(
           `Jupiter swap success,transaction: ${res.txid}
-        inputAddress=${res.inputAddress.toString()} outputAddress=${res.outputAddress.toString()}
+        inputTokenAccount=${res.inputAddress.toString()} outputTokenAccount=${res.outputAddress.toString()}
         inputAmount=${res.inputAmount} outputAmount=${res.outputAmount}`
         );
       } catch (e) {
-        log.alert.warn(`rebalance swap failed: ${e}`);
+        log.alert.warn(`rebalance swap failed: ${e}, payload: %o`, payload);
       }
     }
   }
 };
+
+function getAggCoinInfo(
+  coinBalance: {
+    [k: string]: {
+      balance: Big;
+      decimal: Big;
+    };
+  },
+  coinPrice: Map<
+    string,
+    {
+      price: Big;
+      assetName: string;
+    }
+  >
+) {
+  return Object.fromEntries(
+    Array.from(Object.entries(coinBalance))
+      .map(([mint, amount]) => {
+        const price = coinPrice.get(mint);
+        if (!price) {
+          return undefined;
+        }
+        return [
+          mint,
+          {
+            value: amount.balance.mul(price.price),
+            amount: amount.balance,
+            decimal: amount.decimal,
+            price: price.price,
+            assetName: price.assetName,
+          },
+        ];
+      })
+      .filter(
+        (
+          val
+        ): val is [
+          string,
+          {
+            value: Big;
+            decimal: Big;
+            amount: Big;
+            price: Big;
+            assetName: string;
+          }
+        ] => !!val
+      )
+  );
+}

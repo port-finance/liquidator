@@ -8,7 +8,7 @@ specifiers:
   '@pythnetwork/client': ^2.2.0
   '@solana/buffer-layout': ^4.0.0
   '@solana/spl-token': 0.1.8
-  '@solana/web3.js': 1.42.0
+  '@solana/web3.js': 1.73.3
   '@switchboard-xyz/solana.js': ^2.0.127
   '@switchboard-xyz/switchboard-api': ^0.2.154
   '@types/big.js': ^6.1.2
@@ -31,14 +31,14 @@ specifiers:
   typescript: ^4.9.5
 
 dependencies:
-  '@jup-ag/core': 4.0.0-beta.13_ridjomvc6luluyqfod2hax7foa
-  '@port.finance/port-sdk': 0.2.69_x7hnsalv3tkefoyaeyocjyrlb4
+  '@jup-ag/core': 4.0.0-beta.13_mlfsmfkhehyqf5clsadabbyg7y
+  '@port.finance/port-sdk': 0.2.69_xhdkav6lnb365skl3v6kldcnpi
   '@project-serum/anchor': 0.24.2
   '@project-serum/serum': 0.13.65
-  '@pythnetwork/client': 2.15.0_@solana+web3.js@1.42.0
+  '@pythnetwork/client': 2.15.0_@solana+web3.js@1.73.3
   '@solana/buffer-layout': 4.0.1
   '@solana/spl-token': 0.1.8
-  '@solana/web3.js': 1.42.0
+  '@solana/web3.js': 1.73.3
   '@switchboard-xyz/solana.js': 2.0.127
   '@switchboard-xyz/switchboard-api': 0.2.201_typescript@4.9.5
   axios: 0.21.4
@@ -76,9 +76,9 @@ packages:
     dependencies:
       '@project-serum/anchor': 0.21.0
       '@project-serum/serum': 0.13.65
-      '@project-serum/sol-wallet-adapter': 0.2.6_@solana+web3.js@1.73.2
+      '@project-serum/sol-wallet-adapter': 0.2.6_@solana+web3.js@1.73.3
       '@solana/spl-token': 0.1.8
-      '@solana/web3.js': 1.73.2
+      '@solana/web3.js': 1.73.3
       big.js: 6.2.1
       bn.js: 5.2.1
       buffer-layout: 1.2.2
@@ -97,8 +97,8 @@ packages:
     resolution: {integrity: sha512-PxRl+wu5YyptWiR9F2MBHOLLibm87Z4IMUBPreX+DYBtPM+xggvcPi0KAN7+kIL4IrIhXI8ma5V0MCXxSN1pHg==}
     engines: {node: '>=11'}
     dependencies:
-      '@coral-xyz/borsh': 0.26.0_@solana+web3.js@1.73.2
-      '@solana/web3.js': 1.73.2
+      '@coral-xyz/borsh': 0.26.0_@solana+web3.js@1.73.3
+      '@solana/web3.js': 1.73.3
       base64-js: 1.5.1
       bn.js: 5.2.1
       bs58: 4.0.1
@@ -119,27 +119,27 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@coral-xyz/borsh/0.26.0_@solana+web3.js@1.73.2:
+  /@coral-xyz/borsh/0.26.0_@solana+web3.js@1.73.3:
     resolution: {integrity: sha512-uCZ0xus0CszQPHYfWAqKS5swS1UxvePu83oOF+TWpUkedsNlg6p2p4azxZNSSqwXb9uXMFgxhuMBX9r3Xoi0vQ==}
     engines: {node: '>=10'}
     peerDependencies:
       '@solana/web3.js': ^1.68.0
     dependencies:
-      '@solana/web3.js': 1.73.2
+      '@solana/web3.js': 1.73.3
       bn.js: 5.2.1
       buffer-layout: 1.2.2
     dev: false
 
-  /@cremafinance/anchor-contrib/1.14.3_k32u7lvhejnp3cb2fqwc6jbrau:
+  /@cremafinance/anchor-contrib/1.14.3_b2qot2ihjogmsfczls2ni7cmxy:
     resolution: {integrity: sha512-X57tRaZPWGpgCaYn0bXXDIQ6RzZedppwS5MhtGWm1EiM3flqi8RUxcY2VAsZikQ0inHvrDbEOY85hxPTx1VCtQ==}
     peerDependencies:
       '@project-serum/anchor': ^0.22 || ^0.23 || ^0.24
       '@solana/web3.js': ^1.42
       bn.js: ^4 || ^5
     dependencies:
-      '@cremafinance/solana-contrib': 1.14.3_6bsu7vb2anotvhe7sekundxy3a
+      '@cremafinance/solana-contrib': 1.14.3_xhdkav6lnb365skl3v6kldcnpi
       '@project-serum/anchor': 0.24.2
-      '@solana/web3.js': 1.73.2
+      '@solana/web3.js': 1.73.3
       bn.js: 5.2.1
       eventemitter3: 4.0.7
       lodash.camelcase: 4.3.0
@@ -153,7 +153,7 @@ packages:
       tslib: 2.5.0
     dev: false
 
-  /@cremafinance/solana-contrib/1.14.3_6bsu7vb2anotvhe7sekundxy3a:
+  /@cremafinance/solana-contrib/1.14.3_xhdkav6lnb365skl3v6kldcnpi:
     resolution: {integrity: sha512-3cAF98Pyb9ySDljdcwPuCNmZ0wFv54Kh9lskqqPNj0oMVzStwknq2Kvipecr5iR2G7bF80/RptlV9RixuurjOA==}
     peerDependencies:
       '@solana/web3.js': ^1.42
@@ -161,7 +161,7 @@ packages:
     dependencies:
       '@cremafinance/option-utils': 1.14.3
       '@solana/buffer-layout': 4.0.1
-      '@solana/web3.js': 1.73.2
+      '@solana/web3.js': 1.73.3
       '@types/promise-retry': 1.1.3
       '@types/retry': 0.12.2
       bn.js: 5.2.1
@@ -457,7 +457,7 @@ packages:
       '@jridgewell/sourcemap-codec': 1.4.14
     dev: true
 
-  /@jup-ag/core/4.0.0-beta.13_ridjomvc6luluyqfod2hax7foa:
+  /@jup-ag/core/4.0.0-beta.13_mlfsmfkhehyqf5clsadabbyg7y:
     resolution: {integrity: sha512-4XSoaptXaWq5QsmqVSNNsMWsnlOs4cLo/05DDacMvrbStCC5Gg5aY5SztQKoDwkIm0vkHu++aXaKgMjk1zJlWA==}
     engines: {node: '>=10'}
     peerDependencies:
@@ -467,28 +467,28 @@ packages:
       '@jup-ag/crema-sdk-v2': 2.1.6
       '@jup-ag/cykura-sdk': 0.1.25
       '@jup-ag/cykura-sdk-core': 0.1.8
-      '@jup-ag/deltafi-sdk': 0.0.2_@solana+web3.js@1.42.0
-      '@jup-ag/dradex-idl': 0.2.1_@solana+web3.js@1.42.0
-      '@jup-ag/dradex-sdk': 0.2.3_2sm2x2a3agxeee2dvl4i2gxvwa
+      '@jup-ag/deltafi-sdk': 0.0.2_@solana+web3.js@1.73.3
+      '@jup-ag/dradex-idl': 0.2.1_@solana+web3.js@1.73.3
+      '@jup-ag/dradex-sdk': 0.2.3_woxevs7dt47gj47dduv2n24gpy
       '@jup-ag/goosefx-ssl-sdk': 1.2.17
       '@jup-ag/invariant': 0.9.35
       '@jup-ag/lifinity-sdk': 0.1.72
       '@jup-ag/lifinity-sdk-v2': 1.0.8
       '@jup-ag/math': 4.0.0-beta.13
-      '@jup-ag/phoenix-sdk': 1.0.7_@solana+web3.js@1.42.0
+      '@jup-ag/phoenix-sdk': 1.0.7_@solana+web3.js@1.73.3
       '@jup-ag/raydium-clmm-sdk': 1.0.5
       '@jup-ag/whirlpools-sdk': 0.7.2
       '@mercurial-finance/dynamic-amm-sdk': 0.2.3_dkdkowpja53n64epoxymo6xlnu
-      '@mercurial-finance/optimist': 0.2.0_uaddxilqje56gbevckaobszugi
+      '@mercurial-finance/optimist': 0.2.0_nz5dsmnmncbgnroqxjanqjxama
       '@mercurial-finance/vault-sdk': 0.3.12
       '@noble/hashes': 1.1.2
       '@project-serum/anchor': 0.24.2
       '@project-serum/serum': 0.13.65
-      '@pythnetwork/client': 2.7.3_@solana+web3.js@1.42.0
-      '@saberhq/stableswap-sdk': 1.13.6_plgy3gj3erzt3dml53exhfwqni
+      '@pythnetwork/client': 2.7.3_@solana+web3.js@1.73.3
+      '@saberhq/stableswap-sdk': 1.13.6_foyj5bdafwes6xuhb6v3bnc3ni
       '@solana/buffer-layout': 4.0.1
       '@solana/spl-token': 0.1.8
-      '@solana/web3.js': 1.42.0
+      '@solana/web3.js': 1.73.3
       bignumber.js: 9.1.0
       bn.js: 5.2.1
       cross-fetch: 3.1.5
@@ -510,10 +510,10 @@ packages:
   /@jup-ag/crema-sdk-v2/2.1.6:
     resolution: {integrity: sha512-YhYfzbZCB0G0XciDO0vFXOpJsIn6kveVYolXuJ0toj2t7W0OM9NfvdtUvboUbhE92nJfzpHBScb3X9Qosb8KOA==}
     dependencies:
-      '@cremafinance/anchor-contrib': 1.14.3_k32u7lvhejnp3cb2fqwc6jbrau
+      '@cremafinance/anchor-contrib': 1.14.3_b2qot2ihjogmsfczls2ni7cmxy
       '@project-serum/anchor': 0.24.2
       '@solana/buffer-layout': 4.0.1
-      '@solana/web3.js': 1.73.2
+      '@solana/web3.js': 1.73.3
       bn.js: 5.2.1
       decimal.js: 10.4.3
       jsbi: 4.3.0
@@ -537,6 +537,7 @@ packages:
     transitivePeerDependencies:
       - bufferutil
       - encoding
+      - supports-color
       - utf-8-validate
     dev: false
 
@@ -546,23 +547,24 @@ packages:
     dependencies:
       '@cykura/sdk-core': /@jup-ag/cykura-sdk-core/0.1.8
       '@project-serum/anchor': 0.22.1
-      '@solana/web3.js': 1.42.0
+      '@solana/web3.js': 1.73.3
       tiny-invariant: 1.3.1
     transitivePeerDependencies:
       - bufferutil
       - encoding
+      - supports-color
       - utf-8-validate
     dev: false
 
-  /@jup-ag/deltafi-sdk/0.0.2_@solana+web3.js@1.42.0:
+  /@jup-ag/deltafi-sdk/0.0.2_@solana+web3.js@1.73.3:
     resolution: {integrity: sha512-x5aibvJn4JSa7TnviYLDchkxOluvE9W209jy90YfuccNsIDRB3qhDK5rpSu8y2kInXJFA++CY5qTr2VklvdqtQ==}
     peerDependencies:
       '@solana/web3.js': '>=1.32.0'
     dependencies:
       '@project-serum/anchor': 0.24.2
-      '@pythnetwork/client': 2.15.0_@solana+web3.js@1.42.0
+      '@pythnetwork/client': 2.15.0_@solana+web3.js@1.73.3
       '@solana/spl-token': 0.1.8
-      '@solana/web3.js': 1.42.0
+      '@solana/web3.js': 1.73.3
       bigint-buffer: 1.1.5
       bignumber.js: 9.1.1
       bn.js: 5.2.1
@@ -573,30 +575,31 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@jup-ag/dradex-idl/0.2.1_@solana+web3.js@1.42.0:
+  /@jup-ag/dradex-idl/0.2.1_@solana+web3.js@1.73.3:
     resolution: {integrity: sha512-CZ5GZTLExy1+fw/tFOo6C4AbU0o/PcqJxxQpDp5UkSJ0SXbz7ZGMz9DfKu+htJuAwxwGgS/rbQfeBoU9fhDXuQ==}
     peerDependencies:
       '@solana/web3.js': '>=1.4.0'
     dependencies:
       '@solana/buffer-layout': 4.0.0
-      '@solana/web3.js': 1.42.0
+      '@solana/web3.js': 1.73.3
       bn.js: 5.2.1
     dev: false
 
-  /@jup-ag/dradex-sdk/0.2.3_2sm2x2a3agxeee2dvl4i2gxvwa:
+  /@jup-ag/dradex-sdk/0.2.3_woxevs7dt47gj47dduv2n24gpy:
     resolution: {integrity: sha512-VGvJzy1aYFs7pdEBsyHipLDODG2JoczCBbNXkUjOMqf0RK8Cq0Ofwa6znDKDqK63sO+JdOD41dyQoswwsFUmVQ==}
     peerDependencies:
       '@project-serum/anchor': '>=0.25.0'
     dependencies:
-      '@dradex/idl': /@jup-ag/dradex-idl/0.2.1_@solana+web3.js@1.42.0
+      '@dradex/idl': /@jup-ag/dradex-idl/0.2.1_@solana+web3.js@1.73.3
       '@project-serum/anchor': 0.24.2
-      '@solana/spl-token': 0.3.7_@solana+web3.js@1.42.0
+      '@solana/spl-token': 0.3.7_@solana+web3.js@1.73.3
       decimal.js: 10.4.3
       jsbi: 4.3.0
     transitivePeerDependencies:
       - '@solana/web3.js'
       - bufferutil
       - encoding
+      - supports-color
       - utf-8-validate
     dev: false
 
@@ -604,10 +607,10 @@ packages:
     resolution: {integrity: sha512-ouBfsJqLeiWXccx026gEuOtoEo67uVt9FAFA3rP8fbX5DW9hS5n40vwGbAVXbftcbfJDdymsSep95WdjYJ4rZA==}
     dependencies:
       '@project-serum/anchor': 0.17.1-beta.2
-      '@pythnetwork/client': 2.15.0_@solana+web3.js@1.42.0
+      '@pythnetwork/client': 2.15.0_@solana+web3.js@1.73.3
       '@solana/buffer-layout': 4.0.1
       '@solana/spl-token': 0.2.0
-      '@solana/web3.js': 1.42.0
+      '@solana/web3.js': 1.73.3
     transitivePeerDependencies:
       - bufferutil
       - encoding
@@ -624,6 +627,7 @@ packages:
     transitivePeerDependencies:
       - bufferutil
       - encoding
+      - supports-color
       - utf-8-validate
     dev: false
 
@@ -631,11 +635,11 @@ packages:
     resolution: {integrity: sha512-9NKK3ky3mhCVRg93lkYYf6POTUXc6p033l4i4mYaUbqh3s0MNRn1zKqMoQmqSuJDVFzKQlVWWKLkuYv2+Wr86A==}
     dependencies:
       '@project-serum/anchor': 0.24.2
-      '@project-serum/borsh': 0.2.5_@solana+web3.js@1.42.0
+      '@project-serum/borsh': 0.2.5_@solana+web3.js@1.73.3
       '@project-serum/serum': 0.13.65
-      '@pythnetwork/client': 2.15.0_@solana+web3.js@1.42.0
+      '@pythnetwork/client': 2.15.0_@solana+web3.js@1.73.3
       '@solana/spl-token': 0.1.8
-      '@solana/web3.js': 1.42.0
+      '@solana/web3.js': 1.73.3
       decimal.js: 10.4.3
     transitivePeerDependencies:
       - bufferutil
@@ -669,13 +673,13 @@ packages:
       jsbi: 4.3.0
     dev: false
 
-  /@jup-ag/phoenix-sdk/1.0.7_@solana+web3.js@1.42.0:
+  /@jup-ag/phoenix-sdk/1.0.7_@solana+web3.js@1.73.3:
     resolution: {integrity: sha512-k++jnqNQo9HDlsElTcJgVI9bg0cymAP2Zny5w6rpyjTyNJuct0hCDKVF07BdV5IPqoAvy2EntL+9UB8LEL0uXg==}
     dependencies:
       '@metaplex-foundation/beet': 0.7.1
       '@metaplex-foundation/rustbin': 0.3.1
       '@metaplex-foundation/solita': 0.12.2
-      '@solana/spl-token': 0.3.7_@solana+web3.js@1.42.0
+      '@solana/spl-token': 0.3.7_@solana+web3.js@1.73.3
       '@types/node': 18.14.0
       bn.js: 5.2.1
       borsh: 0.7.0
@@ -692,9 +696,9 @@ packages:
     resolution: {integrity: sha512-m20iDGdu3CLG6jB3fWPpEOfI9qnp0MyLIM+3YLklYCmPf3WQCJ45NS2NSFPKJBQv/IhB7N8P/Fn0KZ0fpwbJEw==}
     dependencies:
       '@project-serum/anchor': 0.24.2
-      '@project-serum/borsh': 0.2.5_@solana+web3.js@1.73.2
+      '@project-serum/borsh': 0.2.5_@solana+web3.js@1.73.3
       '@solana/spl-token': 0.1.8
-      '@solana/web3.js': 1.73.2
+      '@solana/web3.js': 1.73.3
       decimal.js: 10.4.3
     transitivePeerDependencies:
       - bufferutil
@@ -709,7 +713,7 @@ packages:
       '@orca-so/common-sdk': 0.1.11
       '@project-serum/anchor': 0.25.0
       '@solana/spl-token': 0.1.8
-      '@solana/web3.js': 1.73.2
+      '@solana/web3.js': 1.73.3
       decimal.js: 10.4.3
       tiny-invariant: 1.3.1
     transitivePeerDependencies:
@@ -724,12 +728,13 @@ packages:
     engines: {node: '>=10'}
     dependencies:
       '@solana/spl-token': 0.1.8
-      '@solana/web3.js': 1.42.0
+      '@solana/web3.js': 1.73.3
       decimal.js: 10.4.3
       tiny-invariant: 1.3.1
     transitivePeerDependencies:
       - bufferutil
       - encoding
+      - supports-color
       - utf-8-validate
     dev: false
 
@@ -761,6 +766,7 @@ packages:
     transitivePeerDependencies:
       - bufferutil
       - encoding
+      - supports-color
       - utf-8-validate
     dev: false
 
@@ -771,13 +777,13 @@ packages:
     dependencies:
       '@mercurial-finance/vault-sdk': 0.3.12_plhixtjxfbfr3mbxehj34lupl4
       '@project-serum/anchor': 0.24.2
-      '@saberhq/anchor-contrib': 1.14.11_zd2m6gebao25dqvjtwaxtekaxm
-      '@saberhq/stableswap-sdk': 1.14.11_plgy3gj3erzt3dml53exhfwqni
-      '@saberhq/token-utils': 1.13.32_plgy3gj3erzt3dml53exhfwqni
+      '@saberhq/anchor-contrib': 1.14.11_b2qot2ihjogmsfczls2ni7cmxy
+      '@saberhq/stableswap-sdk': 1.14.11_foyj5bdafwes6xuhb6v3bnc3ni
+      '@saberhq/token-utils': 1.13.32_foyj5bdafwes6xuhb6v3bnc3ni
       '@solana/buffer-layout': 4.0.1
       '@solana/spl-token': 0.1.8
       '@solana/spl-token-registry': 0.2.1105
-      '@solana/web3.js': 1.42.0
+      '@solana/web3.js': 1.73.3
       bn-sqrt: 1.0.0
       bn.js: 5.2.1
       decimal.js: 10.4.3
@@ -802,6 +808,7 @@ packages:
       - bufferutil
       - debug
       - encoding
+      - supports-color
       - utf-8-validate
     dev: false
 
@@ -823,7 +830,7 @@ packages:
       promise-retry: 2.0.1
     dev: false
 
-  /@mercurial-finance/optimist/0.2.0_uaddxilqje56gbevckaobszugi:
+  /@mercurial-finance/optimist/0.2.0_nz5dsmnmncbgnroqxjanqjxama:
     resolution: {integrity: sha512-tUA1y83jTXroEClGN7dyhHxKZ+C+zKbSRx/LA7BltMumNG8mFSWJpi5uwkhmfhmSzvSgDob/qw0py3lFjw/FKQ==}
     engines: {node: '>=10'}
     peerDependencies:
@@ -832,7 +839,7 @@ packages:
       bn.js: '>=5.2.0'
     dependencies:
       '@solana/spl-token': 0.1.8
-      '@solana/web3.js': 1.42.0
+      '@solana/web3.js': 1.73.3
       bn.js: 5.2.1
       promise-retry: 2.0.1
     dev: false
@@ -854,13 +861,14 @@ packages:
     transitivePeerDependencies:
       - bufferutil
       - encoding
+      - supports-color
       - utf-8-validate
     dev: false
 
   /@mercurial-finance/solend-sdk/0.6.5:
     resolution: {integrity: sha512-544KqvD1IkpnyTUDOCt0yVlTcayt9rv+CTXHTFQDinWQQkA8uWBoiNbI0g49bJVE//Np3SbJSOgJmq5KlxgvWQ==}
     dependencies:
-      '@solana/web3.js': 1.73.2
+      '@solana/web3.js': 1.73.3
       bn.js: 5.2.1
       buffer: 6.0.3
       buffer-layout: 1.2.2
@@ -875,9 +883,9 @@ packages:
     resolution: {integrity: sha512-ySPxAtFLtati9Vv7g3czrcNEiT9HBZboRDNnfEDmCFJqsub87Y2ZF125dpspaZzKUlolOrBIqBy1FZYIreMgfg==}
     dependencies:
       '@project-serum/anchor': 0.25.0
-      '@project-serum/associated-token': 0.1.1_@solana+web3.js@1.73.2
-      '@project-serum/borsh': 0.2.5_@solana+web3.js@1.73.2
-      '@solana/web3.js': 1.73.2
+      '@project-serum/associated-token': 0.1.1_@solana+web3.js@1.73.3
+      '@project-serum/borsh': 0.2.5_@solana+web3.js@1.73.3
+      '@solana/web3.js': 1.73.3
       lodash: 4.17.21
     transitivePeerDependencies:
       - bufferutil
@@ -958,7 +966,7 @@ packages:
     resolution: {integrity: sha512-tgyEl6dvtLln8XX81JyBvWjIiEcjTkUwZbrM5dIobTmoqMuGewSyk9CClno8qsMsFdB5T3jC91Rjeqmu/6xk2g==}
     dependencies:
       '@metaplex-foundation/beet': 0.7.1
-      '@solana/web3.js': 1.73.2
+      '@solana/web3.js': 1.73.3
       bs58: 5.0.0
       debug: 4.3.4
     transitivePeerDependencies:
@@ -1006,7 +1014,7 @@ packages:
       '@metaplex-foundation/beet': 0.4.0
       '@metaplex-foundation/beet-solana': 0.3.1
       '@metaplex-foundation/rustbin': 0.3.1
-      '@solana/web3.js': 1.42.0
+      '@solana/web3.js': 1.73.3
       camelcase: 6.3.0
       debug: 4.3.4
       js-sha256: 0.9.0
@@ -1067,10 +1075,11 @@ packages:
     transitivePeerDependencies:
       - bufferutil
       - encoding
+      - supports-color
       - utf-8-validate
     dev: false
 
-  /@port.finance/port-sdk/0.2.69_x7hnsalv3tkefoyaeyocjyrlb4:
+  /@port.finance/port-sdk/0.2.69_xhdkav6lnb365skl3v6kldcnpi:
     resolution: {integrity: sha512-Vhv72U4RSSFMBqr7kNx2kzakfWspnphWfYliOHqBALEmmS/JO8Nwf4cctVCqfjVc2pasjNqpIi7ltojRLLXAgg==}
     engines: {node: '>=10'}
     peerDependencies:
@@ -1078,12 +1087,12 @@ packages:
       bn.js: ^5.2.0
     dependencies:
       '@project-serum/anchor': 0.21.0
-      '@saberhq/solana-contrib': 1.14.11_x7hnsalv3tkefoyaeyocjyrlb4
-      '@saberhq/token-utils': 1.14.11_plgy3gj3erzt3dml53exhfwqni
+      '@saberhq/solana-contrib': 1.14.11_xhdkav6lnb365skl3v6kldcnpi
+      '@saberhq/token-utils': 1.14.11_foyj5bdafwes6xuhb6v3bnc3ni
       '@solana/buffer-layout': 3.0.0
       '@solana/spl-token': 0.1.8
       '@solana/spl-token-registry': 0.2.4574
-      '@solana/web3.js': 1.42.0
+      '@solana/web3.js': 1.73.3
       big.js: 6.2.1
       bignumber.js: 9.1.1
       bn.js: 5.2.1
@@ -1095,6 +1104,7 @@ packages:
     transitivePeerDependencies:
       - bufferutil
       - encoding
+      - supports-color
       - utf-8-validate
     dev: false
 
@@ -1102,8 +1112,8 @@ packages:
     resolution: {integrity: sha512-oIdm4vTJkUy6GmE6JgqDAuQPKI7XM4TPJkjtoIzp69RZe0iAD9JP2XHx7lV1jLdYXeYHqDXfBt3zcq7W91K6PA==}
     engines: {node: '>=11'}
     dependencies:
-      '@project-serum/borsh': 0.2.5_@solana+web3.js@1.42.0
-      '@solana/web3.js': 1.42.0
+      '@project-serum/borsh': 0.2.5_@solana+web3.js@1.73.3
+      '@solana/web3.js': 1.73.3
       base64-js: 1.5.1
       bn.js: 5.2.1
       bs58: 4.0.1
@@ -1119,6 +1129,7 @@ packages:
     transitivePeerDependencies:
       - bufferutil
       - encoding
+      - supports-color
       - utf-8-validate
     dev: false
 
@@ -1126,8 +1137,8 @@ packages:
     resolution: {integrity: sha512-uUqojV+oTmzjf/OelVj7anD71/wWnkdKAaNpz4Q57T06XUaFPnNbOvKh7c991/WDVGXrdDCQcx6nRQEP1tQn2Q==}
     engines: {node: '>=11'}
     dependencies:
-      '@project-serum/borsh': 0.2.5_@solana+web3.js@1.42.0
-      '@solana/web3.js': 1.42.0
+      '@project-serum/borsh': 0.2.5_@solana+web3.js@1.73.3
+      '@solana/web3.js': 1.73.3
       base64-js: 1.5.1
       bn.js: 5.2.1
       bs58: 4.0.1
@@ -1143,6 +1154,7 @@ packages:
     transitivePeerDependencies:
       - bufferutil
       - encoding
+      - supports-color
       - utf-8-validate
     dev: false
 
@@ -1150,8 +1162,8 @@ packages:
     resolution: {integrity: sha512-2TuBmGUn9qeYz6sJINJlElrBuPsaUAtYyUsJ3XplEBf1pczrANAgs5ceJUFzdiqGEWLn+84ObSdBeChT/AXYFA==}
     engines: {node: '>=11'}
     dependencies:
-      '@project-serum/borsh': 0.2.5_@solana+web3.js@1.42.0
-      '@solana/web3.js': 1.42.0
+      '@project-serum/borsh': 0.2.5_@solana+web3.js@1.73.3
+      '@solana/web3.js': 1.73.3
       base64-js: 1.5.1
       bn.js: 5.2.1
       bs58: 4.0.1
@@ -1167,6 +1179,7 @@ packages:
     transitivePeerDependencies:
       - bufferutil
       - encoding
+      - supports-color
       - utf-8-validate
     dev: false
 
@@ -1174,8 +1187,8 @@ packages:
     resolution: {integrity: sha512-flRuW/F+iC8mitNokx82LOXyND7Dyk6n5UUPJpQv/+NfySFrNFlzuQZaBZJ4CG5g9s8HS/uaaIz1nVkDR8V/QA==}
     engines: {node: '>=11'}
     dependencies:
-      '@project-serum/borsh': 0.2.5_@solana+web3.js@1.42.0
-      '@solana/web3.js': 1.42.0
+      '@project-serum/borsh': 0.2.5_@solana+web3.js@1.73.3
+      '@solana/web3.js': 1.73.3
       base64-js: 1.5.1
       bn.js: 5.2.1
       bs58: 4.0.1
@@ -1192,6 +1205,7 @@ packages:
     transitivePeerDependencies:
       - bufferutil
       - encoding
+      - supports-color
       - utf-8-validate
     dev: false
 
@@ -1199,8 +1213,8 @@ packages:
     resolution: {integrity: sha512-5pHeyvQhzLahIQ8aZymmDMZJAJFklN0joZdI+YIqFkK2uU/mlKr6rBLQjxysf/j1mLLiNG00tdyLfUtTAdQz7w==}
     engines: {node: '>=11'}
     dependencies:
-      '@project-serum/borsh': 0.2.5_@solana+web3.js@1.42.0
-      '@solana/web3.js': 1.42.0
+      '@project-serum/borsh': 0.2.5_@solana+web3.js@1.73.3
+      '@solana/web3.js': 1.73.3
       base64-js: 1.5.1
       bn.js: 5.2.1
       bs58: 4.0.1
@@ -1217,6 +1231,7 @@ packages:
     transitivePeerDependencies:
       - bufferutil
       - encoding
+      - supports-color
       - utf-8-validate
     dev: false
 
@@ -1224,8 +1239,8 @@ packages:
     resolution: {integrity: sha512-0/718g8/DnEuwAidUwh5wLYphUYXhUbiClkuRNhvNoa+1Y8a4g2tJyxoae+emV+PG/Gikd/QUBNMkIcimiIRTA==}
     engines: {node: '>=11'}
     dependencies:
-      '@project-serum/borsh': 0.2.5_@solana+web3.js@1.42.0
-      '@solana/web3.js': 1.42.0
+      '@project-serum/borsh': 0.2.5_@solana+web3.js@1.73.3
+      '@solana/web3.js': 1.73.3
       base64-js: 1.5.1
       bn.js: 5.2.1
       bs58: 4.0.1
@@ -1241,6 +1256,7 @@ packages:
     transitivePeerDependencies:
       - bufferutil
       - encoding
+      - supports-color
       - utf-8-validate
     dev: false
 
@@ -1248,8 +1264,8 @@ packages:
     resolution: {integrity: sha512-E6A5Y/ijqpfMJ5psJvbw0kVTzLZFUcOFgs6eSM2M2iWE1lVRF18T6hWZVNl6zqZsoz98jgnNHtVGJMs+ds9A7A==}
     engines: {node: '>=11'}
     dependencies:
-      '@project-serum/borsh': 0.2.5_@solana+web3.js@1.42.0
-      '@solana/web3.js': 1.42.0
+      '@project-serum/borsh': 0.2.5_@solana+web3.js@1.73.3
+      '@solana/web3.js': 1.73.3
       base64-js: 1.5.1
       bn.js: 5.2.1
       bs58: 4.0.1
@@ -1266,6 +1282,7 @@ packages:
     transitivePeerDependencies:
       - bufferutil
       - encoding
+      - supports-color
       - utf-8-validate
     dev: false
 
@@ -1273,8 +1290,8 @@ packages:
     resolution: {integrity: sha512-edesFlclgQzIluD2mC0xrGPnABBllKvbGd6MOtNZMCauUnx1Xbu073um8O6mrCeuZrz4PG9AhwAp1y5cOl3R4A==}
     engines: {node: '>=11'}
     dependencies:
-      '@project-serum/borsh': 0.2.5_@solana+web3.js@1.42.0
-      '@solana/web3.js': 1.42.0
+      '@project-serum/borsh': 0.2.5_@solana+web3.js@1.73.3
+      '@solana/web3.js': 1.73.3
       base64-js: 1.5.1
       bn.js: 5.2.1
       bs58: 4.0.1
@@ -1291,6 +1308,7 @@ packages:
     transitivePeerDependencies:
       - bufferutil
       - encoding
+      - supports-color
       - utf-8-validate
     dev: false
 
@@ -1298,8 +1316,8 @@ packages:
     resolution: {integrity: sha512-Nq+COIjE1135T7qfnOHEn7E0q39bQTgXLFk837/rgFe6Hkew9WML7eHsS+lSYD2p3OJaTiUOHTAq1lHy36oIqQ==}
     engines: {node: '>=11'}
     dependencies:
-      '@coral-xyz/borsh': 0.26.0_@solana+web3.js@1.73.2
-      '@solana/web3.js': 1.73.2
+      '@coral-xyz/borsh': 0.26.0_@solana+web3.js@1.73.3
+      '@solana/web3.js': 1.73.3
       base64-js: 1.5.1
       bn.js: 5.2.1
       bs58: 4.0.1
@@ -1320,13 +1338,13 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@project-serum/associated-token/0.1.1_@solana+web3.js@1.73.2:
+  /@project-serum/associated-token/0.1.1_@solana+web3.js@1.73.3:
     resolution: {integrity: sha512-Zc1wdqragbDiyBVagzIbIsMe37P7fgkArWZPIj+jJjDIoznlmYMK6ASU5mtdDZrPJ7sNABF/lzZ3+jvCCcU+oA==}
     engines: {node: '>=10'}
     peerDependencies:
       '@solana/web3.js': ^0.86.1
     dependencies:
-      '@solana/web3.js': 1.73.2
+      '@solana/web3.js': 1.73.3
     dev: false
 
   /@project-serum/borsh/0.2.5_@solana+web3.js@1.31.0:
@@ -1340,24 +1358,13 @@ packages:
       buffer-layout: 1.2.2
     dev: false
 
-  /@project-serum/borsh/0.2.5_@solana+web3.js@1.42.0:
+  /@project-serum/borsh/0.2.5_@solana+web3.js@1.73.3:
     resolution: {integrity: sha512-UmeUkUoKdQ7rhx6Leve1SssMR/Ghv8qrEiyywyxSWg7ooV7StdpPBhciiy5eB3T0qU1BXvdRNC8TdrkxK7WC5Q==}
     engines: {node: '>=10'}
     peerDependencies:
       '@solana/web3.js': ^1.2.0
     dependencies:
-      '@solana/web3.js': 1.42.0
-      bn.js: 5.2.1
-      buffer-layout: 1.2.2
-    dev: false
-
-  /@project-serum/borsh/0.2.5_@solana+web3.js@1.73.2:
-    resolution: {integrity: sha512-UmeUkUoKdQ7rhx6Leve1SssMR/Ghv8qrEiyywyxSWg7ooV7StdpPBhciiy5eB3T0qU1BXvdRNC8TdrkxK7WC5Q==}
-    engines: {node: '>=10'}
-    peerDependencies:
-      '@solana/web3.js': ^1.2.0
-    dependencies:
-      '@solana/web3.js': 1.73.2
+      '@solana/web3.js': 1.73.3
       bn.js: 5.2.1
       buffer-layout: 1.2.2
     dev: false
@@ -1368,22 +1375,23 @@ packages:
     dependencies:
       '@project-serum/anchor': 0.11.1
       '@solana/spl-token': 0.1.8
-      '@solana/web3.js': 1.42.0
+      '@solana/web3.js': 1.73.3
       bn.js: 5.2.1
       buffer-layout: 1.2.2
     transitivePeerDependencies:
       - bufferutil
       - encoding
+      - supports-color
       - utf-8-validate
     dev: false
 
-  /@project-serum/sol-wallet-adapter/0.2.6_@solana+web3.js@1.73.2:
+  /@project-serum/sol-wallet-adapter/0.2.6_@solana+web3.js@1.73.3:
     resolution: {integrity: sha512-cpIb13aWPW8y4KzkZAPDgw+Kb+DXjCC6rZoH74MGm3I/6e/zKyGnfAuW5olb2zxonFqsYgnv7ev8MQnvSgJ3/g==}
     engines: {node: '>=10'}
     peerDependencies:
       '@solana/web3.js': ^1.5.0
     dependencies:
-      '@solana/web3.js': 1.73.2
+      '@solana/web3.js': 1.73.3
       bs58: 4.0.1
       eventemitter3: 4.0.7
     dev: false
@@ -1446,13 +1454,13 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@pythnetwork/client/2.15.0_@solana+web3.js@1.42.0:
+  /@pythnetwork/client/2.15.0_@solana+web3.js@1.73.3:
     resolution: {integrity: sha512-PTFI0ZWqbDiuiiB2Xx76ZU9PItHPIIQzsEqpbs0N9aumIeVXh6A1m/oZTZ7pRcG4jA9wROmA+GaYQU8UHzpjWA==}
     peerDependencies:
       '@solana/web3.js': ^1.30.2
     dependencies:
       '@coral-xyz/anchor': 0.26.0
-      '@solana/web3.js': 1.42.0
+      '@solana/web3.js': 1.73.3
       buffer: 6.0.3
     transitivePeerDependencies:
       - bufferutil
@@ -1464,21 +1472,22 @@ packages:
   /@pythnetwork/client/2.5.3:
     resolution: {integrity: sha512-NBLxPnA6A3tZb/DYUooD4SO63UJ70s9DzzFPGXcQNBR9itcycp7aaV+UA5oUPloD/4UHL9soo2fRuDVur0gmhA==}
     dependencies:
-      '@solana/web3.js': 1.42.0
+      '@solana/web3.js': 1.73.3
       assert: 2.0.0
       buffer: 6.0.3
     transitivePeerDependencies:
       - bufferutil
       - encoding
+      - supports-color
       - utf-8-validate
     dev: false
 
-  /@pythnetwork/client/2.7.3_@solana+web3.js@1.42.0:
+  /@pythnetwork/client/2.7.3_@solana+web3.js@1.73.3:
     resolution: {integrity: sha512-+2k5JXxv/yUA6WMESSppJlg4T/AP+nZZfBnHmeG3RPCIJx+bargxFLCK4B2KgpQYdeTWb+2z8yRCNF7tHooCFQ==}
     peerDependencies:
       '@solana/web3.js': ^1.30.2
     dependencies:
-      '@solana/web3.js': 1.42.0
+      '@solana/web3.js': 1.73.3
       buffer: 6.0.3
     dev: false
 
@@ -1495,7 +1504,7 @@ packages:
     dependencies:
       '@project-serum/anchor': 0.24.2
       '@saberhq/anchor-contrib': 1.14.11_tn72k2ctlsdlyaywudiivcprti
-      '@saberhq/token-utils': 1.13.32_plgy3gj3erzt3dml53exhfwqni
+      '@saberhq/token-utils': 1.13.32_foyj5bdafwes6xuhb6v3bnc3ni
       '@solana/web3.js': 1.72.0
       bn.js: 5.2.1
       jsbi: 4.3.0
@@ -1525,6 +1534,23 @@ packages:
       tslib: 2.5.0
     dev: false
 
+  /@saberhq/anchor-contrib/1.14.11_b2qot2ihjogmsfczls2ni7cmxy:
+    resolution: {integrity: sha512-6fOMC9XjuMSpGin/5HGqDita/dYzndjMMUNjht7yQZzD9638cdjrAutwZjvYwMUepKLdJ5CQV4bE74bSeMF9HQ==}
+    peerDependencies:
+      '@project-serum/anchor': ^0.22 || ^0.23 || ^0.24
+      '@solana/web3.js': ^1.42
+      bn.js: ^4 || ^5
+    dependencies:
+      '@project-serum/anchor': 0.24.2
+      '@saberhq/solana-contrib': 1.14.11_xhdkav6lnb365skl3v6kldcnpi
+      '@solana/web3.js': 1.73.3
+      bn.js: 5.2.1
+      eventemitter3: 4.0.7
+      lodash.camelcase: 4.3.0
+      lodash.mapvalues: 4.6.0
+      tslib: 2.5.0
+    dev: false
+
   /@saberhq/anchor-contrib/1.14.11_tn72k2ctlsdlyaywudiivcprti:
     resolution: {integrity: sha512-6fOMC9XjuMSpGin/5HGqDita/dYzndjMMUNjht7yQZzD9638cdjrAutwZjvYwMUepKLdJ5CQV4bE74bSeMF9HQ==}
     peerDependencies:
@@ -1535,23 +1561,6 @@ packages:
       '@project-serum/anchor': 0.24.2
       '@saberhq/solana-contrib': 1.14.11_qh54t4oqtr6naoviur3spgs4ze
       '@solana/web3.js': 1.72.0
-      bn.js: 5.2.1
-      eventemitter3: 4.0.7
-      lodash.camelcase: 4.3.0
-      lodash.mapvalues: 4.6.0
-      tslib: 2.5.0
-    dev: false
-
-  /@saberhq/anchor-contrib/1.14.11_zd2m6gebao25dqvjtwaxtekaxm:
-    resolution: {integrity: sha512-6fOMC9XjuMSpGin/5HGqDita/dYzndjMMUNjht7yQZzD9638cdjrAutwZjvYwMUepKLdJ5CQV4bE74bSeMF9HQ==}
-    peerDependencies:
-      '@project-serum/anchor': ^0.22 || ^0.23 || ^0.24
-      '@solana/web3.js': ^1.42
-      bn.js: ^4 || ^5
-    dependencies:
-      '@project-serum/anchor': 0.24.2
-      '@saberhq/solana-contrib': 1.14.11_x7hnsalv3tkefoyaeyocjyrlb4
-      '@solana/web3.js': 1.42.0
       bn.js: 5.2.1
       eventemitter3: 4.0.7
       lodash.camelcase: 4.3.0
@@ -1583,7 +1592,7 @@ packages:
       tslib: 2.5.0
     dev: false
 
-  /@saberhq/solana-contrib/1.14.11_x7hnsalv3tkefoyaeyocjyrlb4:
+  /@saberhq/solana-contrib/1.14.11_xhdkav6lnb365skl3v6kldcnpi:
     resolution: {integrity: sha512-HOEJpTZnSGmrfJG2gV18vQbtI14ET9l4/Q1yyPk4R2dkydxZIfBIPCI9SRWZ9g01/nuob3Fryd79Ca6QDk7qjw==}
     peerDependencies:
       '@solana/web3.js': ^1.42
@@ -1591,7 +1600,7 @@ packages:
     dependencies:
       '@saberhq/option-utils': 1.14.11
       '@solana/buffer-layout': 4.0.1
-      '@solana/web3.js': 1.42.0
+      '@solana/web3.js': 1.73.3
       '@types/promise-retry': 1.1.3
       '@types/retry': 0.12.2
       bn.js: 5.2.1
@@ -1601,7 +1610,7 @@ packages:
       tslib: 2.5.0
     dev: false
 
-  /@saberhq/stableswap-sdk/1.13.6_plgy3gj3erzt3dml53exhfwqni:
+  /@saberhq/stableswap-sdk/1.13.6_foyj5bdafwes6xuhb6v3bnc3ni:
     resolution: {integrity: sha512-WkMzKnvjAZS6WIYmbqdSmRQXY0X5a6OFsta+tM1+iCp6Yug1OkGYSnYHTZJ4byIgXWvPd9B88c4z5T17sWRUDQ==}
     engines: {node: '>=12.x'}
     peerDependencies:
@@ -1609,10 +1618,10 @@ packages:
       bn.js: '>=5'
       jsbi: ^3 || ^4
     dependencies:
-      '@saberhq/solana-contrib': 1.14.11_x7hnsalv3tkefoyaeyocjyrlb4
-      '@saberhq/token-utils': 1.14.11_plgy3gj3erzt3dml53exhfwqni
+      '@saberhq/solana-contrib': 1.14.11_xhdkav6lnb365skl3v6kldcnpi
+      '@saberhq/token-utils': 1.14.11_foyj5bdafwes6xuhb6v3bnc3ni
       '@solana/buffer-layout': 4.0.1
-      '@solana/web3.js': 1.42.0
+      '@solana/web3.js': 1.73.3
       bn.js: 5.2.1
       jsbi: 4.3.0
       lodash.mapvalues: 4.6.0
@@ -1621,10 +1630,11 @@ packages:
     transitivePeerDependencies:
       - bufferutil
       - encoding
+      - supports-color
       - utf-8-validate
     dev: false
 
-  /@saberhq/stableswap-sdk/1.14.11_plgy3gj3erzt3dml53exhfwqni:
+  /@saberhq/stableswap-sdk/1.14.11_foyj5bdafwes6xuhb6v3bnc3ni:
     resolution: {integrity: sha512-nEOLIFC1QyeoNOtIQMotlyaGfYCsmyJJn0HqrjJL2tcX87zWOmH5aEEfhmg9jJ19aiFYPvQeQ6h8eKp+nFk9Ow==}
     engines: {node: '>=12.x'}
     peerDependencies:
@@ -1632,10 +1642,10 @@ packages:
       bn.js: '>=5'
       jsbi: ^3 || ^4
     dependencies:
-      '@saberhq/solana-contrib': 1.14.11_x7hnsalv3tkefoyaeyocjyrlb4
-      '@saberhq/token-utils': 1.14.11_plgy3gj3erzt3dml53exhfwqni
+      '@saberhq/solana-contrib': 1.14.11_xhdkav6lnb365skl3v6kldcnpi
+      '@saberhq/token-utils': 1.14.11_foyj5bdafwes6xuhb6v3bnc3ni
       '@solana/buffer-layout': 4.0.1
-      '@solana/web3.js': 1.42.0
+      '@solana/web3.js': 1.73.3
       bn.js: 5.2.1
       jsbi: 4.3.0
       tiny-invariant: 1.3.1
@@ -1643,20 +1653,21 @@ packages:
     transitivePeerDependencies:
       - bufferutil
       - encoding
+      - supports-color
       - utf-8-validate
     dev: false
 
-  /@saberhq/token-utils/1.13.32_plgy3gj3erzt3dml53exhfwqni:
+  /@saberhq/token-utils/1.13.32_foyj5bdafwes6xuhb6v3bnc3ni:
     resolution: {integrity: sha512-n5ECiw82IQJwyq9bTkcrbNWVi+lAQoQlJlTmIye8odUQATBsqOWN+clqfrFkn/UMmezO60bo34bUaM0Oir7Pew==}
     peerDependencies:
       '@solana/web3.js': ^1.42
       bn.js: ^4 || ^5
       jsbi: ^3 || ^4
     dependencies:
-      '@saberhq/solana-contrib': 1.14.11_x7hnsalv3tkefoyaeyocjyrlb4
+      '@saberhq/solana-contrib': 1.14.11_xhdkav6lnb365skl3v6kldcnpi
       '@solana/buffer-layout': 4.0.1
       '@solana/spl-token': 0.1.8
-      '@solana/web3.js': 1.42.0
+      '@solana/web3.js': 1.73.3
       '@ubeswap/token-math': 5.2.1_jsbi@4.3.0
       bn.js: 5.2.1
       jsbi: 4.3.0
@@ -1665,20 +1676,21 @@ packages:
     transitivePeerDependencies:
       - bufferutil
       - encoding
+      - supports-color
       - utf-8-validate
     dev: false
 
-  /@saberhq/token-utils/1.14.11_plgy3gj3erzt3dml53exhfwqni:
+  /@saberhq/token-utils/1.14.11_foyj5bdafwes6xuhb6v3bnc3ni:
     resolution: {integrity: sha512-C+K1IHQuLwG6APT8wbrlvJPM4arTcNHnnydqZbMpsi1Zyyis+UPM3n/PgHmyX2ydtQ+GzPMLFMgxahtjicEgXw==}
     peerDependencies:
       '@solana/web3.js': ^1.42
       bn.js: ^4 || ^5
       jsbi: ^3 || ^4
     dependencies:
-      '@saberhq/solana-contrib': 1.14.11_x7hnsalv3tkefoyaeyocjyrlb4
+      '@saberhq/solana-contrib': 1.14.11_xhdkav6lnb365skl3v6kldcnpi
       '@solana/buffer-layout': 4.0.1
       '@solana/spl-token': 0.1.8
-      '@solana/web3.js': 1.42.0
+      '@solana/web3.js': 1.73.3
       '@ubeswap/token-math': 5.2.1_jsbi@4.3.0
       bn.js: 5.2.1
       jsbi: 4.3.0
@@ -1687,6 +1699,7 @@ packages:
     transitivePeerDependencies:
       - bufferutil
       - encoding
+      - supports-color
       - utf-8-validate
     dev: false
 
@@ -1709,12 +1722,13 @@ packages:
     engines: {node: '>= 10'}
     dependencies:
       '@solana/buffer-layout': 4.0.1
-      '@solana/web3.js': 1.42.0
+      '@solana/web3.js': 1.73.3
       bigint-buffer: 1.1.5
       bignumber.js: 9.1.1
     transitivePeerDependencies:
       - bufferutil
       - encoding
+      - supports-color
       - utf-8-validate
     dev: false
 
@@ -1758,7 +1772,7 @@ packages:
     engines: {node: '>= 10'}
     dependencies:
       '@babel/runtime': 7.20.13
-      '@solana/web3.js': 1.42.0
+      '@solana/web3.js': 1.73.3
       bn.js: 5.2.1
       buffer: 6.0.3
       buffer-layout: 1.2.2
@@ -1766,6 +1780,7 @@ packages:
     transitivePeerDependencies:
       - bufferutil
       - encoding
+      - supports-color
       - utf-8-validate
     dev: false
 
@@ -1775,7 +1790,7 @@ packages:
     dependencies:
       '@solana/buffer-layout': 4.0.1
       '@solana/buffer-layout-utils': 0.2.0
-      '@solana/web3.js': 1.42.0
+      '@solana/web3.js': 1.73.3
       start-server-and-test: 1.15.4
     transitivePeerDependencies:
       - bufferutil
@@ -1784,7 +1799,7 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@solana/spl-token/0.3.7_@solana+web3.js@1.42.0:
+  /@solana/spl-token/0.3.7_@solana+web3.js@1.73.3:
     resolution: {integrity: sha512-bKGxWTtIw6VDdCBngjtsGlKGLSmiu/8ghSt/IOYJV24BsymRbgq7r12GToeetpxmPaZYLddKwAz7+EwprLfkfg==}
     engines: {node: '>=16'}
     peerDependencies:
@@ -1792,27 +1807,12 @@ packages:
     dependencies:
       '@solana/buffer-layout': 4.0.1
       '@solana/buffer-layout-utils': 0.2.0
-      '@solana/web3.js': 1.42.0
+      '@solana/web3.js': 1.73.3
       buffer: 6.0.3
     transitivePeerDependencies:
       - bufferutil
       - encoding
-      - utf-8-validate
-    dev: false
-
-  /@solana/spl-token/0.3.7_@solana+web3.js@1.73.2:
-    resolution: {integrity: sha512-bKGxWTtIw6VDdCBngjtsGlKGLSmiu/8ghSt/IOYJV24BsymRbgq7r12GToeetpxmPaZYLddKwAz7+EwprLfkfg==}
-    engines: {node: '>=16'}
-    peerDependencies:
-      '@solana/web3.js': ^1.47.4
-    dependencies:
-      '@solana/buffer-layout': 4.0.1
-      '@solana/buffer-layout-utils': 0.2.0
-      '@solana/web3.js': 1.73.2
-      buffer: 6.0.3
-    transitivePeerDependencies:
-      - bufferutil
-      - encoding
+      - supports-color
       - utf-8-validate
     dev: false
 
@@ -1828,32 +1828,6 @@ packages:
       bs58: 4.0.1
       buffer: 6.0.1
       cross-fetch: 3.1.5
-      jayson: 3.7.0
-      js-sha3: 0.8.0
-      rpc-websockets: 7.5.0
-      secp256k1: 4.0.3
-      superstruct: 0.14.2
-      tweetnacl: 1.0.3
-    transitivePeerDependencies:
-      - bufferutil
-      - encoding
-      - utf-8-validate
-    dev: false
-
-  /@solana/web3.js/1.42.0:
-    resolution: {integrity: sha512-QqGh5DWzrgsWRx4sCPDQIm3390b7buPR16tZI61slQaQwJ2ymrSXPQCe4PPTJEIlzGjCV3dkn2vpT2R32BfK2Q==}
-    engines: {node: '>=12.20.0'}
-    dependencies:
-      '@babel/runtime': 7.20.13
-      '@ethersproject/sha2': 5.7.0
-      '@solana/buffer-layout': 4.0.1
-      '@solana/buffer-layout-utils': 0.2.0
-      bn.js: 5.2.1
-      borsh: 0.7.0
-      bs58: 4.0.1
-      buffer: 6.0.1
-      cross-fetch: 3.1.5
-      fast-stable-stringify: 1.0.0
       jayson: 3.7.0
       js-sha3: 0.8.0
       rpc-websockets: 7.5.0
@@ -1883,7 +1857,7 @@ packages:
       fast-stable-stringify: 1.0.0
       jayson: 3.7.0
       node-fetch: 2.6.9
-      rpc-websockets: 7.5.0
+      rpc-websockets: 7.5.1
       superstruct: 0.14.2
     transitivePeerDependencies:
       - bufferutil
@@ -1909,7 +1883,7 @@ packages:
       fast-stable-stringify: 1.0.0
       jayson: 3.7.0
       node-fetch: 2.6.9
-      rpc-websockets: 7.5.0
+      rpc-websockets: 7.5.1
       superstruct: 0.14.2
     transitivePeerDependencies:
       - bufferutil
@@ -1918,9 +1892,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@solana/web3.js/1.73.2:
-    resolution: {integrity: sha512-9WACF8W4Nstj7xiDw3Oom22QmrhBh0VyZyZ7JvvG3gOxLWLlX3hvm5nPVJOGcCE/9fFavBbCUb5A6CIuvMGdoA==}
-    engines: {node: '>=12.20.0'}
+  /@solana/web3.js/1.73.3:
+    resolution: {integrity: sha512-vHRMo589XEIpoujpE2sZZ1aMZvfA1ImKfNxobzEFyMb+H5j6mRRUXfdgWD0qJ0sm11e5BcBC7HPeRXJB+7f3Lg==}
     dependencies:
       '@babel/runtime': 7.20.13
       '@noble/ed25519': 1.7.3
@@ -1936,7 +1909,7 @@ packages:
       fast-stable-stringify: 1.0.0
       jayson: 3.7.0
       node-fetch: 2.6.9
-      rpc-websockets: 7.5.0
+      rpc-websockets: 7.5.1
       superstruct: 0.14.2
     transitivePeerDependencies:
       - bufferutil
@@ -1948,7 +1921,7 @@ packages:
   /@switchboard-xyz/common/2.1.31:
     resolution: {integrity: sha512-3XJV0jnZMU0UOY4Eb8K/MzxMHnxbc2MP3oyB2ogoLOEPUoqw/u0H6Cf2gtbnv6oFFHoRuVFcJDgr0U6JpgjOaw==}
     dependencies:
-      '@solana/web3.js': 1.73.2
+      '@solana/web3.js': 1.73.3
       '@types/big.js': 6.1.6
       '@types/bn.js': 5.1.1
       '@types/long': 5.0.0
@@ -1968,9 +1941,9 @@ packages:
     engines: {node: '>=16.0.0', npm: '>=7.0.0'}
     dependencies:
       '@coral-xyz/anchor': 0.26.0
-      '@coral-xyz/borsh': 0.26.0_@solana+web3.js@1.73.2
-      '@solana/spl-token': 0.3.7_@solana+web3.js@1.73.2
-      '@solana/web3.js': 1.73.2
+      '@coral-xyz/borsh': 0.26.0_@solana+web3.js@1.73.3
+      '@solana/spl-token': 0.3.7_@solana+web3.js@1.73.3
+      '@solana/web3.js': 1.73.3
       '@switchboard-xyz/common': 2.1.31
       dotenv: 16.0.3
       lodash: 4.17.21
@@ -1984,7 +1957,7 @@ packages:
   /@switchboard-xyz/switchboard-api/0.2.201_typescript@4.9.5:
     resolution: {integrity: sha512-hlxgeYmO6dbOEcmQzT1SqRxdiCFyVOMpyW4HFPgmPKT0+wSVkjsLc+BKkMGYPDaO0sWMLTJrj0FGhhTsrqd8Mg==}
     dependencies:
-      '@solana/web3.js': 1.42.0
+      '@solana/web3.js': 1.73.3
       form-data: 4.0.0
       protobufjs: 6.11.3
       rpc-websockets: 7.5.0
@@ -1993,6 +1966,7 @@ packages:
     transitivePeerDependencies:
       - bufferutil
       - encoding
+      - supports-color
       - typescript
       - utf-8-validate
     dev: false
@@ -2002,7 +1976,7 @@ packages:
     dependencies:
       '@project-serum/anchor': 0.22.1
       '@solana/spl-token': 0.1.8
-      '@solana/web3.js': 1.42.0
+      '@solana/web3.js': 1.73.3
       '@switchboard-xyz/switchboard-api': 0.2.201_typescript@4.9.5
       assert: 2.0.0
       big.js: 6.2.1
@@ -2017,6 +1991,7 @@ packages:
     transitivePeerDependencies:
       - bufferutil
       - encoding
+      - supports-color
       - utf-8-validate
     dev: false
 
@@ -4012,6 +3987,18 @@ packages:
 
   /rpc-websockets/7.5.0:
     resolution: {integrity: sha512-9tIRi1uZGy7YmDjErf1Ax3wtqdSSLIlnmL5OtOzgd5eqPKbsPpwDP5whUDO2LQay3Xp0CcHlcNSGzacNRluBaQ==}
+    dependencies:
+      '@babel/runtime': 7.20.13
+      eventemitter3: 4.0.7
+      uuid: 8.3.2
+      ws: 8.12.1_3cxu5zja4e2r5wmvge7mdcljwq
+    optionalDependencies:
+      bufferutil: 4.0.7
+      utf-8-validate: 5.0.10
+    dev: false
+
+  /rpc-websockets/7.5.1:
+    resolution: {integrity: sha512-kGFkeTsmd37pHPMaHIgN1LVKXMi0JD782v4Ds9ZKtLlwdTKjn+CxM9A9/gLT2LaOuEcEFGL98h1QWQtlOIdW0w==}
     dependencies:
       '@babel/runtime': 7.20.13
       eventemitter3: 4.0.7

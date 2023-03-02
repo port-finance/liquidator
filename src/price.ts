@@ -1,5 +1,10 @@
 import { AccountInfo, Connection } from "@solana/web3.js";
-import { ReserveInfo, ReserveContext } from "@port.finance/port-sdk";
+import {
+  ReserveInfo,
+  ReserveContext,
+  AssetContext,
+  ReserveId,
+} from "@port.finance/port-sdk";
 import Big from "big.js";
 import { parsePriceData } from "@pythnetwork/client";
 import {
@@ -32,15 +37,21 @@ export async function readReservePrices(
 
 export async function getTokenPrices(
   connection: Connection,
-  reserveContext: ReserveContext
+  reserveContext: ReserveContext,
+  assetCtx: AssetContext
 ) {
-  const tokenPrice: Map<string, Big> = new Map();
+  const tokenPrice: Map<string, { price: Big; assetName: string }> = new Map();
 
   for (const reserve of reserveContext.getAllReserves()) {
-    tokenPrice.set(
-      reserve.getAssetMintId().toString(),
-      await readSymbolPrice(connection, reserve)
-    );
+    tokenPrice.set(reserve.getAssetMintId().toString(), {
+      price: await readSymbolPrice(connection, reserve),
+      assetName: assetCtx
+        .findConfigByReserveId(
+          ReserveId.fromBase58(reserve.getReserveId().toString())
+        )
+        ?.getDisplayConfig()
+        .getSymbol(),
+    });
   }
   return tokenPrice;
 }

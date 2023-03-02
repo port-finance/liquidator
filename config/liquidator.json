@@ -3,8 +3,10 @@
     "valueRatios": {
         "default": 0,
         "overrides": {
-            "So11111111111111111111111111111111111111112": 0.3,
-            "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB": 1
+            "So11111111111111111111111111111111111111112": 0.1,
+            "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB": 1,
+            "Ea5SjE2Y6yvCeW5dYTn7PYMuW5ikXkvbGdcmSnXeaLjS": 0.1,
+            "mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So": 0.1
         }
     }
 }
