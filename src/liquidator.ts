@@ -8,7 +8,7 @@ import {
 import { sendTransaction, sleep } from "./utils";
 import { AccountLayout, Token, TOKEN_PROGRAM_ID, u64 } from "@solana/spl-token";
 import { AccountInfo as TokenAccount } from "@solana/spl-token";
-import { Provider, Wallet } from "@project-serum/anchor";
+import { AnchorProvider, Wallet } from "@project-serum/anchor";
 import {
   liquidateObligationInstruction,
   Port,
@@ -36,6 +36,8 @@ import {
   prepareTokenAccounts,
 } from "./account";
 import { log } from "./infra/logger";
+import { rebalanceCoins } from "./rebalance";
+import { JupiterSwap } from "./infra/thrid/swap";
 
 async function runLiquidator() {
   const clusterUrl = PORT_ENV.CLUSTER_URL;
@@ -48,7 +50,7 @@ async function runLiquidator() {
   // liquidator's keypair
   const bs58KeyPair = PORT_ENV.KEYPAIR;
   const payer = Keypair.fromSecretKey(bs58.decode(bs58KeyPair));
-  const provider = new Provider(connection, new Wallet(payer), {
+  const provider = new AnchorProvider(connection, new Wallet(payer), {
     preflightCommitment: "recent",
     commitment: "recent",
   });
@@ -64,6 +66,13 @@ async function runLiquidator() {
 
   while (true) {
     try {
+      await rebalanceCoins(
+        portApi,
+        connection,
+        await JupiterSwap.new(connection, payer),
+        payer.publicKey
+      );
+
       log.common.info(`start fetching unhealthy obligations...`);
       const unhealthyObligations = await getUnhealthyObligations(connection);
       log.common.info(
@@ -109,7 +118,7 @@ async function runLiquidator() {
 }
 
 async function liquidateUnhealthyObligation(
-  provider: Provider,
+  provider: AnchorProvider,
   programId: PublicKey,
   obligation: EnrichedObligation,
   reserveContext: ReserveContext,
@@ -153,7 +162,11 @@ async function liquidateUnhealthyObligation(
   const collaterals = obligation.obligation.getCollaterals();
 
   const repayLoan = loans.reduce((prev, cur) => {
-    if (prev.getAmount().gt(cur.getAmount())) {
+    if (
+      obligation.loanDetails[prev.getReserveId().toString()].value.gt(
+        obligation.loanDetails[cur.getReserveId().toString()].value
+      )
+    ) {
       return prev;
     }
     return cur;
@@ -164,7 +177,11 @@ async function liquidateUnhealthyObligation(
   const repayAmount = repayLoan.toU64();
 
   const withdrawCollateral = collaterals.reduce((prev, cur) => {
-    if (prev.getAmount().gt(cur.getAmount())) {
+    if (
+      obligation.depositDetails[prev.getReserveId().toString()].value.gt(
+        obligation.depositDetails[cur.getReserveId().toString()].value
+      )
+    ) {
       return prev;
     }
     return cur;
@@ -194,7 +211,7 @@ async function liquidateUnhealthyObligation(
     throw new Error("no collateral wallet found");
   }
   const latestRepayWallet = await fetchTokenAccount(
-    provider,
+    provider.connection,
     repayWallet.address
   );
 
@@ -260,7 +277,7 @@ async function liquidateUnhealthyObligation(
   );
 
   const latestCollateralWallet = await fetchTokenAccount(
-    provider,
+    provider.connection,
     withdrawWallet.address
   );
   wallets.set(
@@ -280,7 +297,7 @@ async function liquidateUnhealthyObligation(
 }
 
 async function liquidateByPayingSOL(
-  provider: Provider,
+  provider: AnchorProvider,
   instructions: TransactionInstruction[],
   signers: Keypair[],
   amount: u64,
@@ -335,7 +352,7 @@ async function liquidateByPayingSOL(
 }
 
 async function liquidateByPayingToken(
-  provider: Provider,
+  provider: AnchorProvider,
   instructions: TransactionInstruction[],
   amount: u64,
   repayWallet: PublicKey,

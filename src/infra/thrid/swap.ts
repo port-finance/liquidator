@@ -1,5 +1,5 @@
 import JSBI from "jsbi";
-import { Connection, PublicKey } from "@solana/web3.js";
+import { Connection, Keypair, PublicKey } from "@solana/web3.js";
 import { Jupiter, TOKEN_LIST_URL, TransactionError } from "@jup-ag/core";
 import Big from "big.js";
 
@@ -18,13 +18,13 @@ export class JupiterSwap {
   private jupiter: Awaited<ReturnType<typeof Jupiter.load>>;
   private routeMap: Map<string, string[]>;
 
-  static async new(conn: Connection, wallet: PublicKey) {
+  static async new(conn: Connection, wallet: Keypair) {
     const o = new JupiterSwap();
     await o.init(conn, wallet);
     return o;
   }
 
-  private async init(conn: Connection, wallet: PublicKey) {
+  private async init(conn: Connection, wallet: Keypair) {
     // this.tokens = await (await fetch(TOKEN_LIST_URL["mainnet-beta"])).json();
     this.jupiter = await Jupiter.load({
       connection: conn,
