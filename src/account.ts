@@ -1,6 +1,5 @@
-import { Provider, BN } from "@project-serum/anchor";
+import { AnchorProvider, BN } from "@project-serum/anchor";
 import { ReserveContext } from "@port.finance/port-sdk";
-import { getTokenAccount, parseTokenAccount } from "@project-serum/common";
 import {
   AccountInfo as TokenAccount,
   AccountLayout,
@@ -16,11 +15,11 @@ import {
   Transaction,
 } from "@solana/web3.js";
 import { STAKING_PROGRAM_ID } from "./const";
-import { sendTransaction } from "./utils";
+import { parseTokenAccount, sendTransaction } from "./utils";
 import { log } from "./infra/logger";
 
 export async function prepareTokenAccounts(
-  provider: Provider,
+  provider: AnchorProvider,
   reserveContext: ReserveContext
 ): Promise<Map<string, TokenAccount>> {
   const wallets: Map<string, TokenAccount> = new Map<string, TokenAccount>();
@@ -102,7 +101,7 @@ export async function findLargestTokenAccountForOwner(
   let maxPubkey: null | PublicKey = null;
 
   for (const { pubkey, account } of response.value) {
-    const tokenAccount = parseTokenAccount(account.data);
+    const tokenAccount = parseTokenAccount(account, pubkey);
     if (tokenAccount.amount.gt(max)) {
       maxTokenAccount = tokenAccount;
       max = tokenAccount.amount;
@@ -164,23 +163,26 @@ export async function getOwnedTokenAccounts(
     ],
   });
   return accounts.map((r) => {
-    const tokenAccount = parseTokenAccount(r.account.data);
+    const tokenAccount = parseTokenAccount(r.account, r.pubkey);
     tokenAccount.address = r.pubkey;
     return tokenAccount;
   });
 }
 
 export async function fetchTokenAccount(
-  provider: Provider,
+  conn: Connection,
   address: PublicKey
 ): Promise<TokenAccount> {
-  const tokenAccount = await getTokenAccount(provider, address);
-  tokenAccount.address = address;
+  const account = await conn.getAccountInfo(address);
+  if (!account) {
+    throw Error(`Token account not found: ${address.toString()}`);
+  }
+  const tokenAccount = parseTokenAccount(account, address);
   return tokenAccount;
 }
 
 export async function createAssociatedTokenAccount(
-  provider: Provider,
+  provider: AnchorProvider,
   mint: PublicKey
 ): Promise<PublicKey> {
   const aTokenAddr = await Token.getAssociatedTokenAddress(

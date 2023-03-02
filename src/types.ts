@@ -10,4 +10,13 @@ export interface EnrichedObligation {
   obligation: PortProfile;
   loanAssetNames: string[];
   depositedAssetNames: string[];
+  // ReserveId -> reserve detail
+  loanDetails: Record<string, AssetDetail>;
+  depositDetails: Record<string, AssetDetail>;
+}
+
+export interface AssetDetail {
+  price: Big;
+  value: Big;
+  assetName: string;
 }

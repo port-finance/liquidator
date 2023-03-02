@@ -2,9 +2,16 @@ import {
   Keypair,
   Transaction,
   sendAndConfirmRawTransaction,
+  AccountInfo,
+  PublicKey,
+  TransactionInstruction,
 } from "@solana/web3.js";
-import { TransactionInstruction } from "@solana/web3.js";
-import { Provider } from "@project-serum/anchor";
+import { AnchorProvider } from "@project-serum/anchor";
+import {
+  AccountInfo as TokenAccount,
+  AccountLayout,
+  u64,
+} from "@solana/spl-token";
 
 export function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -15,7 +22,7 @@ export const getUnixTs = () => {
 };
 
 export async function sendTransaction(
-  provider: Provider,
+  provider: AnchorProvider,
   instructions: TransactionInstruction[],
   signers: Keypair[],
   confirm?: boolean
@@ -49,3 +56,33 @@ export async function sendTransaction(
     );
   }
 }
+
+export const parseTokenAccount = (
+  info: AccountInfo<Buffer>,
+  address: PublicKey
+): TokenAccount => {
+  const rawAccount = AccountLayout.decode(info.data);
+
+  return {
+    address,
+    mint: new PublicKey(rawAccount.mint),
+    owner: new PublicKey(rawAccount.owner),
+    amount: u64.fromBuffer(rawAccount.amount),
+    delegate: rawAccount.delegateOption === 0 ? rawAccount.delegate : null,
+    delegatedAmount:
+      rawAccount.delegateOption === 0
+        ? new u64(0)
+        : u64.fromBuffer(rawAccount.delegatedAmount),
+    // state enum: https://solana-labs.github.io/solana-program-library/token/js/enums/AccountState.html
+    isInitialized: rawAccount.state !== 0,
+    isFrozen: rawAccount.state === 2,
+    isNative: !!rawAccount.isNativeOption,
+    rentExemptReserve:
+      rawAccount.isNativeOption === 1
+        ? u64.fromBuffer(rawAccount.isNative)
+        : null,
+    closeAuthority: rawAccount.closeAuthorityOption
+      ? new PublicKey(rawAccount.closeAuthority)
+      : null,
+  };
+};

@@ -4,7 +4,7 @@ import {
   refreshReserveInstruction,
   redeemReserveCollateralInstruction,
 } from "@port.finance/port-sdk";
-import { Provider } from "@project-serum/anchor";
+import { AnchorProvider } from "@project-serum/anchor";
 import { Keypair, PublicKey, TransactionInstruction } from "@solana/web3.js";
 import {
   AccountInfo as TokenAccount,
@@ -16,7 +16,7 @@ import { fetchTokenAccount } from "./account";
 import { log } from "./infra/logger";
 
 export async function redeemRemainingCollaterals(
-  provider: Provider,
+  provider: AnchorProvider,
   programId: PublicKey,
   reserveContext: ReserveContext,
   wallets: Map<string, TokenAccount>
@@ -40,7 +40,7 @@ export async function redeemRemainingCollaterals(
 
     try {
       const collateralWallet = await fetchTokenAccount(
-        provider,
+        provider.connection,
         collateralWalletPubkey.address
       );
       wallets.set(reserve.getShareMintId().toString(), collateralWallet);
@@ -59,7 +59,7 @@ export async function redeemRemainingCollaterals(
 }
 
 export async function redeemCollateral(
-  provider: Provider,
+  provider: AnchorProvider,
   wallets: Map<string, TokenAccount>,
   withdrawReserve: ReserveInfo,
   lendingMarketAuthority: PublicKey

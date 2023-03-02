@@ -7,7 +7,7 @@ import {
 import { Connection } from "@solana/web3.js";
 import { readReservePrices } from "./price";
 import Big from "big.js";
-import { EnrichedObligation } from "./types";
+import { AssetDetail, EnrichedObligation } from "./types";
 import { DISPLAY_FIRST, portEnv, ZERO } from "./const";
 import { log } from "./infra/logger";
 
@@ -85,6 +85,9 @@ function generateEnrichedObligation(
   let totalLoanValue = new Big(0);
   const loanAssetNames: string[] = [];
   const assetCtx = portEnv.getAssetContext();
+  const loanDetails: Record<string, AssetDetail> = {};
+  const depositDetails: Record<string, AssetDetail> = {};
+
   for (const loan of obligation.getLoans()) {
     const reservePubKey = loan.getReserveId().toString();
     const name = assetCtx
@@ -104,6 +107,12 @@ function generateEnrichedObligation(
       .div(reserve.getQuantityContext().multiplier);
     totalLoanValue = totalLoanValue.add(loanValue);
     loanAssetNames.push(name ?? "unknown");
+
+    loanDetails[reservePubKey] = {
+      assetName: name,
+      price: tokenPrice,
+      value: loanValue,
+    };
   }
 
   let totalLiquidationLoanValue: Big = new Big(0);
@@ -130,6 +139,16 @@ function generateEnrichedObligation(
     totalLiquidationLoanValue =
       totalLiquidationLoanValue.add(liquidationLoanValue);
     depositedAssetNames.push(name ?? "unknown");
+
+    depositDetails[reservePubKey] = {
+      assetName: name,
+      price: tokenPrice,
+      value: deposit
+        .getRaw()
+        .div(exchangeRatio.getRaw())
+        .mul(tokenPrice)
+        .div(reserve.getQuantityContext().multiplier),
+    };
   }
 
   const riskFactor: number =
@@ -144,5 +163,7 @@ function generateEnrichedObligation(
     obligation,
     loanAssetNames,
     depositedAssetNames,
+    loanDetails,
+    depositDetails,
   };
 }
