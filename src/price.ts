@@ -18,7 +18,7 @@ import {
 } from "./const";
 import { types as SBTypes } from "@switchboard-xyz/solana.js";
 import { BN } from "@project-serum/anchor";
-import { log } from "./infra/logger";
+import { log } from "./infra/logger/";
 
 export async function readReservePrices(
   connection: Connection,
