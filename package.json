@@ -33,7 +33,6 @@
     "@solana/web3.js": "1.73.3",
     "@switchboard-xyz/solana.js": "^2.0.127",
     "@switchboard-xyz/switchboard-api": "^0.2.154",
-    "axios": "^0.21.1",
     "big.js": "^6.1.1",
     "bn.js": "5.2.1",
     "bs58": "^5.0.0",
@@ -43,6 +42,6 @@
     "winston": "^3.8.2",
     "winston-transport": "^4.5.0"
   },
-  "author": "",
-  "license": "ISC"
+  "author": "Port Finance Team",
+  "license": "Apache 2.0"
 }
