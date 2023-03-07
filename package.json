@@ -28,18 +28,20 @@
     "@project-serum/anchor": "0.24.2",
     "@project-serum/serum": "^0.13.41",
     "@pythnetwork/client": "^2.2.0",
+    "@solana/buffer-layout": "^4.0.0",
     "@solana/spl-token": "0.1.8",
     "@solana/web3.js": "1.73.3",
     "@switchboard-xyz/solana.js": "^2.0.127",
     "@switchboard-xyz/switchboard-api": "^0.2.154",
-    "@solana/buffer-layout": "^4.0.0",
     "axios": "^0.21.1",
     "big.js": "^6.1.1",
     "bn.js": "5.2.1",
     "bs58": "^5.0.0",
     "buffer-layout": "^1.2.1",
     "jsbi": "^4.3.0",
-    "pino": "^8.11.0"
+    "slack-block-builder": "^2.7.2",
+    "winston": "^3.8.2",
+    "winston-transport": "^4.5.0"
   },
   "author": "",
   "license": "ISC"

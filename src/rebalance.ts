@@ -139,13 +139,15 @@ export const rebalanceCoins = async (
           payload.inputAmount,
           slippageBps
         );
-        log.trace.warn(
-          `Jupiter swap success,transaction: ${res.txid}
-        inputTokenAccount=${res.inputAddress.toString()} outputTokenAccount=${res.outputAddress.toString()}
-        inputAmount=${res.inputAmount} outputAmount=${res.outputAmount}`
-        );
+        log.trace.warn(`Jupiter swap success`, {
+          transaction: res.txid,
+          inputTokenAccount: res.inputAddress.toString(),
+          outputTokenAccount: res.outputAddress.toString(),
+          inputAmount: res.inputAmount,
+          outputAmount: res.outputAmount,
+        });
       } catch (e) {
-        log.alert.warn(`rebalance swap failed: ${e}, payload: %o`, payload);
+        log.alert.warn(`rebalance swap failed: ${e}, payload:`, payload);
       }
     }
   }
