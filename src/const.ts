@@ -1,6 +1,7 @@
 import { Environment } from "@port.finance/port-sdk";
 import { PublicKey } from "@solana/web3.js";
 import Big from "big.js";
+import { readFileSync } from "fs";
 
 export const portEnv = Environment.forMainNet();
 
@@ -24,6 +25,7 @@ export const PORT_ENV = (() => {
   return {
     HEARTBEAT_WEBHOOK_URL: process.env.HEARTBEAT_WEBHOOK_URL,
     ALERT_WEBHOOK_URL: process.env.ALERT_WEBHOOK_URL,
+    TRACE_WEBHOOK_URL: process.env.TRACE_WEBHOOK_URL,
     KEYPAIR: process.env.KEYPAIR!,
     PROGRAM_ID: new PublicKey(
       process.env.PROGRAM_ID ?? "Port7uDYB3wk6GJAw4KT1WpTeMtSu9bTcChBHkX2LfR"
@@ -32,5 +34,16 @@ export const PORT_ENV = (() => {
       process.env.CLUSTER_URL ??
       "https://port-finance.rpcpool.com/385f15db-1967-4777-a05e-3c0ad9afd955",
     CHECK_INTERVAL: parseFloat(process.env.CHECK_INTERVAL || "8000"),
+    CONFIG_FILE: process.env.CONFIG_FILE ?? "./config/liquidator.json",
   };
 })();
+
+export const LiquidatorConfig = JSON.parse(
+  readFileSync(PORT_ENV.CONFIG_FILE).toString()
+) as {
+  stableCoin: string;
+  valueRatios: {
+    default: number;
+    overrides: Record<string, number>;
+  };
+};

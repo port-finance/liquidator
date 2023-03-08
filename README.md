@@ -7,6 +7,7 @@ To run the liquidator you will need:
 - A Solana account with some SOL deposited to cover transaction fees
 - Token accounts for each token in the reserve
 - Roughly equal dollar value for each token.
+- The liquidator will automatically rebalance the account, you just need esure the account maintains enough USDC. The rebalance will be done proportionally based on `config/liquidator.json`.
 
 ### Deploy to K8s Cluster
 

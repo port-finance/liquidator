@@ -3,21 +3,11 @@ import {
   Connection,
   PublicKey,
   SystemProgram,
-  AccountInfo,
   TransactionInstruction,
 } from "@solana/web3.js";
-import {
-  createAssociatedTokenAccount,
-  defaultTokenAccount,
-  fetchTokenAccount,
-  getOwnedTokenAccounts,
-  notify,
-  sendTransaction,
-  sleep,
-} from "./utils";
+import { sendTransaction, sleep } from "./utils";
 import { AccountLayout, Token, TOKEN_PROGRAM_ID, u64 } from "@solana/spl-token";
-import { AccountInfo as TokenAccount } from "@solana/spl-token";
-import { Provider, Wallet } from "@project-serum/anchor";
+import { AnchorProvider, Wallet } from "@project-serum/anchor";
 import {
   liquidateObligationInstruction,
   Port,
@@ -29,7 +19,7 @@ import {
   ReserveInfo,
 } from "@port.finance/port-sdk";
 import * as bs58 from "bs58";
-import { EnrichedObligation } from "./types";
+import { EnrichedObligation, TokenAccountDetail } from "./types";
 import { getUnhealthyObligations } from "./obligation";
 import {
   LAMPORT_DECIMAL,
@@ -37,9 +27,16 @@ import {
   portEnv,
   PORT_ENV,
   SOL_MINT as SOL_MINT_ID,
-  STAKING_PROGRAM_ID,
 } from "./const";
 import { redeemCollateral, redeemRemainingCollaterals } from "./redeem";
+import {
+  fetchStakingAccounts,
+  fetchTokenAccount,
+  prepareTokenAccounts,
+} from "./account";
+import { log } from "./infra/logger";
+import { rebalanceCoins } from "./rebalance";
+import { JupiterSwap } from "./infra/thrid/swap";
 
 async function runLiquidator() {
   const clusterUrl = PORT_ENV.CLUSTER_URL;
@@ -52,7 +49,7 @@ async function runLiquidator() {
   // liquidator's keypair
   const bs58KeyPair = PORT_ENV.KEYPAIR;
   const payer = Keypair.fromSecretKey(bs58.decode(bs58KeyPair));
-  const provider = new Provider(connection, new Wallet(payer), {
+  const provider = new AnchorProvider(connection, new Wallet(payer), {
     preflightCommitment: "recent",
     commitment: "recent",
   });
@@ -60,7 +57,7 @@ async function runLiquidator() {
   const portApi = Port.forMainNet({
     connection: connection,
   });
-  console.log(`Port liquidator launched on cluster=${clusterUrl}`);
+  log.common.info(`Port liquidator launched on cluster=${clusterUrl}`);
 
   const reserveContext = await portApi.getReserveContext();
 
@@ -68,24 +65,33 @@ async function runLiquidator() {
 
   while (true) {
     try {
-      console.log(`start fetching unhealthy obligations...`);
-      const unhealthyObligations = await getUnhealthyObligations(connection);
-      console.log(
-        `Time: ${new Date()} - payer account ${payer.publicKey.toBase58()}, we have ${
-          unhealthyObligations.length
-        } accounts for liquidation`
+      await rebalanceCoins(
+        portApi,
+        connection,
+        await JupiterSwap.new(connection, payer),
+        payer.publicKey
       );
+
+      log.common.info(`start fetching unhealthy obligations...`);
+      const unhealthyObligations = await getUnhealthyObligations(connection);
+      log.common.info(
+        `payer account ${payer.publicKey.toBase58()}, we have ${
+          unhealthyObligations.length
+        } accounts for liquidation
+`
+      );
+
       for (const unhealthyObligation of unhealthyObligations) {
-        notify(
+        log.common.info(
           `Liquidating obligation account ${unhealthyObligation.obligation
             .getProfileId()
             .toString()} which is owned by ${unhealthyObligation.obligation
             .getOwner()
             ?.toBase58()} with risk factor: ${
             unhealthyObligation.riskFactor
-          }, which has borrowed ${unhealthyObligation.totalLoanValue} ...
-`
+          }, which has borrowed ${unhealthyObligation.totalLoanValue} ...`
         );
+
         await liquidateUnhealthyObligation(
           provider,
           programId,
@@ -102,8 +108,7 @@ async function runLiquidator() {
         );
       }
     } catch (e) {
-      notify(`unknown error: ${e}`);
-      console.error("error: ", e);
+      log.alert.info(`unknown error: ${e}`);
     } finally {
       await sleep(checkInterval);
     }
@@ -111,43 +116,12 @@ async function runLiquidator() {
   }
 }
 
-async function prepareTokenAccounts(
-  provider: Provider,
-  reserveContext: ReserveContext
-): Promise<Map<string, TokenAccount>> {
-  const wallets: Map<string, TokenAccount> = new Map<string, TokenAccount>();
-
-  const tokenAccounts = await getOwnedTokenAccounts(provider);
-  for (const tokenAccount of tokenAccounts) {
-    wallets.set(tokenAccount.mint.toString(), tokenAccount);
-  }
-
-  const mintIds: PublicKey[] = reserveContext
-    .getAllReserves()
-    .flatMap((reserve) => [reserve.getAssetMintId(), reserve.getShareMintId()]);
-
-  for (const mintId of mintIds) {
-    if (!wallets.has(mintId.toString())) {
-      const aTokenAddress = await createAssociatedTokenAccount(
-        provider,
-        mintId
-      );
-      wallets.set(
-        mintId.toString(),
-        defaultTokenAccount(aTokenAddress, provider.wallet.publicKey, mintId)
-      );
-    }
-  }
-
-  return wallets;
-}
-
 async function liquidateUnhealthyObligation(
-  provider: Provider,
+  provider: AnchorProvider,
   programId: PublicKey,
   obligation: EnrichedObligation,
   reserveContext: ReserveContext,
-  wallets: Map<string, TokenAccount>
+  wallets: Map<string, TokenAccountDetail>
 ) {
   const payerAccount = await provider.connection.getAccountInfo(
     provider.wallet.publicKey
@@ -187,7 +161,11 @@ async function liquidateUnhealthyObligation(
   const collaterals = obligation.obligation.getCollaterals();
 
   const repayLoan = loans.reduce((prev, cur) => {
-    if (prev.getAmount().gt(cur.getAmount())) {
+    if (
+      obligation.loanDetails[prev.getReserveId().toString()].value.gt(
+        obligation.loanDetails[cur.getReserveId().toString()].value
+      )
+    ) {
       return prev;
     }
     return cur;
@@ -198,7 +176,11 @@ async function liquidateUnhealthyObligation(
   const repayAmount = repayLoan.toU64();
 
   const withdrawCollateral = collaterals.reduce((prev, cur) => {
-    if (prev.getAmount().gt(cur.getAmount())) {
+    if (
+      obligation.depositDetails[prev.getReserveId().toString()].value.gt(
+        obligation.depositDetails[cur.getReserveId().toString()].value
+      )
+    ) {
       return prev;
     }
     return cur;
@@ -213,7 +195,7 @@ async function liquidateUnhealthyObligation(
       !wallets.has(withdrawReserve.getShareMintId().toString()))
   ) {
     throw Error(
-      `No required wallet exists, required ${repayReserve
+      `No required wallet asset exists, required ${repayReserve
         .getAssetMintId()
         .toString()} and ${withdrawReserve.getShareMintId().toString()}`
     );
@@ -228,7 +210,7 @@ async function liquidateUnhealthyObligation(
     throw new Error("no collateral wallet found");
   }
   const latestRepayWallet = await fetchTokenAccount(
-    provider,
+    provider.connection,
     repayWallet.address
   );
 
@@ -289,12 +271,12 @@ async function liquidateUnhealthyObligation(
     .findConfigByReserveId(withdrawReserve.getReserveId())
     ?.getDisplayConfig()
     .getName();
-  console.log(
-    `Liqudiation transaction sent: ${liquidationSig}, paying ${repayTokenName} for ${withdrawTokenName}.`
+  log.common.warn(
+    `Liqudiation transaction sent successfule: ${liquidationSig}, paying ${repayTokenName} for ${withdrawTokenName}.`
   );
 
   const latestCollateralWallet = await fetchTokenAccount(
-    provider,
+    provider.connection,
     withdrawWallet.address
   );
   wallets.set(
@@ -308,13 +290,13 @@ async function liquidateUnhealthyObligation(
     lendingMarketAuthority
   );
 
-  console.log(
+  log.common.warn(
     `Redeemed ${latestCollateralWallet.amount.toString()} lamport of ${withdrawTokenName} collateral tokens: ${redeemSig}`
   );
 }
 
 async function liquidateByPayingSOL(
-  provider: Provider,
+  provider: AnchorProvider,
   instructions: TransactionInstruction[],
   signers: Keypair[],
   amount: u64,
@@ -368,42 +350,8 @@ async function liquidateByPayingSOL(
   signers.push(wrappedSOLTokenAccount);
 }
 
-async function fetchStakingAccounts(
-  connection: Connection,
-  owner: PublicKey,
-  stakingPool: PublicKey | null
-): Promise<
-  Array<{
-    pubkey: PublicKey;
-    account: AccountInfo<Buffer>;
-  }>
-> {
-  if (stakingPool === null) {
-    return [];
-  }
-  return await connection.getProgramAccounts(STAKING_PROGRAM_ID, {
-    filters: [
-      {
-        dataSize: 233,
-      },
-      {
-        memcmp: {
-          offset: 1 + 16,
-          bytes: owner.toBase58(),
-        },
-      },
-      {
-        memcmp: {
-          offset: 1 + 16 + 32,
-          bytes: stakingPool.toBase58(),
-        },
-      },
-    ],
-  });
-}
-
 async function liquidateByPayingToken(
-  provider: Provider,
+  provider: AnchorProvider,
   instructions: TransactionInstruction[],
   amount: u64,
   repayWallet: PublicKey,

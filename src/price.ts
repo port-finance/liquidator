@@ -1,5 +1,10 @@
 import { AccountInfo, Connection } from "@solana/web3.js";
-import { ReserveInfo, ReserveContext, ReserveId } from "@port.finance/port-sdk";
+import {
+  ReserveInfo,
+  ReserveContext,
+  AssetContext,
+  ReserveId,
+} from "@port.finance/port-sdk";
 import Big from "big.js";
 import { parsePriceData } from "@pythnetwork/client";
 import {
@@ -7,15 +12,15 @@ import {
   SwitchboardAccountType,
 } from "@switchboard-xyz/switchboard-api";
 import {
-  portEnv,
   PYTH_PROGRAM,
   SWITCHBOARD_PROGRAM_V1,
   SWITCHBOARD_PROGRAM_V2,
 } from "./const";
 import { types as SBTypes } from "@switchboard-xyz/solana.js";
 import { BN } from "@project-serum/anchor";
+import { log } from "./infra/logger/";
 
-export async function readTokenPrices(
+export async function readReservePrices(
   connection: Connection,
   reserveContext: ReserveContext
 ): Promise<Map<string, Big>> {
@@ -30,32 +35,41 @@ export async function readTokenPrices(
   return tokenToCurrentPrice;
 }
 
+export async function getTokenPrices(
+  connection: Connection,
+  reserveContext: ReserveContext,
+  assetCtx: AssetContext
+) {
+  const tokenPrice: Map<string, { price: Big; assetName: string }> = new Map();
+
+  for (const reserve of reserveContext.getAllReserves()) {
+    tokenPrice.set(reserve.getAssetMintId().toString(), {
+      price: await readSymbolPrice(connection, reserve),
+      assetName: assetCtx
+        .findConfigByReserveId(
+          ReserveId.fromBase58(reserve.getReserveId().toString())
+        )
+        ?.getDisplayConfig()
+        .getSymbol(),
+    });
+  }
+  return tokenPrice;
+}
+
 async function readSymbolPrice(
   connection: Connection,
   reserve: ReserveInfo
 ): Promise<Big> {
   const oracleId = reserve.getOracleId();
 
-  // const reserveName = portEnv
-  //   .getAssetContext()
-  //   .findConfigByReserveId(reserve.getReserveId())
-  //   ?.getDisplayConfig()
-  //   .getName();
-
   if (oracleId) {
     const oracleData = await connection.getAccountInfo(oracleId);
     if (!oracleData) {
       throw new Error("cannot fetch account oracle data");
     }
-    // console.log(
-    //   `ReserveId: ${reserve
-    //     .getReserveId()
-    //     .toString()}, Token: ${reserveName} price from oracle`
-    // );
     return parseOracleData(oracleData, reserve);
   }
 
-  // console.log(`Token: ${reserveName} price from mark price`);
   return reserve.getMarkPrice().getRaw();
 }
 
@@ -76,7 +90,6 @@ function parseOracleData(
     if (!dataFeed) {
       return reserveInfo.getMarkPrice().getRaw();
     }
-    // console.log("sb-v1 ", dataFeed.toString());
     return Big(dataFeed);
   } else if (accountInfo.owner.toString() === SWITCHBOARD_PROGRAM_V2) {
     const feed = SBTypes.AggregatorAccountData.decode(accountInfo.data);
@@ -88,7 +101,6 @@ function parseOracleData(
       Big(10).pow(priceDesc.scale)
     );
 
-    // console.log("sb-v2 ", price.toString());
     return price;
   }
 
@@ -130,11 +142,10 @@ function parseSBV1PriceData(accountInfo: AccountInfo<Buffer>) {
       return maybeRound.result;
     case SwitchboardAccountType.TYPE_AGGREGATOR_RESULT_PARSE_OPTIMIZED:
       const round = decodeSBV1OptimizedPrice(data);
-      console.log(`data: ${JSON.stringify(data)}`);
-      console.log(`switchbaord v1 round: ${JSON.stringify(round)}`);
+      log.common.info(`switchbaord v1 round: ${JSON.stringify(round)}`);
       return round.result.result;
     default:
-      console.log(`Invalid switchboard-v1 account data type`);
+      log.common.info(`Invalid switchboard-v1 account data type`);
       return undefined;
   }
 }

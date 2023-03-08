@@ -26,6 +26,11 @@ async function main() {
       const reserves = (await port.getReserveContext()).getAllReserves();
       await Promise.all(
         reserves.map(async (reserve) => {
+          console.log(
+            `asset mint id: ${reserve
+              .getAssetMintId()
+              .toString()}, share mint id: ${reserve.getShareMintId()}`
+          );
           const oracleId = reserve.getOracleId();
           if (oracleId) {
             const oracleData = await conn.getAccountInfo(oracleId);

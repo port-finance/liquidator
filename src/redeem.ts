@@ -4,20 +4,19 @@ import {
   refreshReserveInstruction,
   redeemReserveCollateralInstruction,
 } from "@port.finance/port-sdk";
-import { Provider } from "@project-serum/anchor";
+import { AnchorProvider } from "@project-serum/anchor";
 import { Keypair, PublicKey, TransactionInstruction } from "@solana/web3.js";
-import {
-  AccountInfo as TokenAccount,
-  Token,
-  TOKEN_PROGRAM_ID,
-} from "@solana/spl-token";
-import { fetchTokenAccount, sendTransaction } from "./utils";
+import { Token, TOKEN_PROGRAM_ID } from "@solana/spl-token";
+import { sendTransaction } from "./utils";
+import { fetchTokenAccount } from "./account";
+import { log } from "./infra/logger";
+import { TokenAccountDetail } from "./types";
 
 export async function redeemRemainingCollaterals(
-  provider: Provider,
+  provider: AnchorProvider,
   programId: PublicKey,
   reserveContext: ReserveContext,
-  wallets: Map<string, TokenAccount>
+  wallets: Map<string, TokenAccountDetail>
 ) {
   const lendingMarket: PublicKey = reserveContext
     .getAllReserves()[0]
@@ -38,7 +37,7 @@ export async function redeemRemainingCollaterals(
 
     try {
       const collateralWallet = await fetchTokenAccount(
-        provider,
+        provider.connection,
         collateralWalletPubkey.address
       );
       wallets.set(reserve.getShareMintId().toString(), collateralWallet);
@@ -51,14 +50,14 @@ export async function redeemRemainingCollaterals(
         );
       }
     } catch (e) {
-      console.log(e);
+      log.alert.info(e);
     }
   });
 }
 
 export async function redeemCollateral(
-  provider: Provider,
-  wallets: Map<string, TokenAccount>,
+  provider: AnchorProvider,
+  wallets: Map<string, TokenAccountDetail>,
   withdrawReserve: ReserveInfo,
   lendingMarketAuthority: PublicKey
 ): Promise<string> {

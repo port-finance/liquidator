@@ -1,30 +1,19 @@
 import {
-  Connection,
-  PublicKey,
   Keypair,
   Transaction,
   sendAndConfirmRawTransaction,
-} from "@solana/web3.js";
-import axios from "axios";
-import {
   AccountInfo,
+  PublicKey,
+  TransactionInstruction,
+  ParsedAccountData,
+} from "@solana/web3.js";
+import { AnchorProvider, BN } from "@project-serum/anchor";
+import {
+  AccountInfo as TokenAccount,
   AccountLayout,
-  ASSOCIATED_TOKEN_PROGRAM_ID,
-  Token,
-  TOKEN_PROGRAM_ID,
+  u64,
 } from "@solana/spl-token";
-import { TransactionInstruction } from "@solana/web3.js";
-import { AccountInfo as TokenAccount } from "@solana/spl-token";
-import { getTokenAccount, parseTokenAccount } from "@project-serum/common";
-import { BN, Provider } from "@project-serum/anchor";
-import { PORT_ENV } from "./const";
-
-export function notify(content: string) {
-  if (PORT_ENV.HEARTBEAT_WEBHOOK_URL) {
-    axios.post(PORT_ENV.HEARTBEAT_WEBHOOK_URL, { text: content });
-  }
-  console.log(content);
-}
+import { TokenAccountDetail } from "./types";
 
 export function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -34,130 +23,8 @@ export const getUnixTs = () => {
   return new Date().getTime() / 1000;
 };
 
-export async function findLargestTokenAccountForOwner(
-  connection: Connection,
-  owner: Keypair,
-  mint: PublicKey
-): Promise<TokenAccount> {
-  const response = await connection.getTokenAccountsByOwner(
-    owner.publicKey,
-    { mint },
-    connection.commitment
-  );
-  let max = new BN(0);
-  let maxTokenAccount: TokenAccount | null = null;
-  let maxPubkey: null | PublicKey = null;
-
-  for (const { pubkey, account } of response.value) {
-    const tokenAccount = parseTokenAccount(account.data);
-    if (tokenAccount.amount.gt(max)) {
-      maxTokenAccount = tokenAccount;
-      max = tokenAccount.amount;
-      maxPubkey = pubkey;
-    }
-  }
-
-  if (maxPubkey && maxTokenAccount) {
-    return maxTokenAccount;
-  } else {
-    console.log("creating new token account");
-    const transaction = new Transaction();
-    const aTokenAccountPubkey = (
-      await PublicKey.findProgramAddress(
-        [
-          owner.publicKey.toBuffer(),
-          TOKEN_PROGRAM_ID.toBuffer(),
-          mint.toBuffer(),
-        ],
-        ASSOCIATED_TOKEN_PROGRAM_ID
-      )
-    )[0];
-
-    transaction.add(
-      Token.createAssociatedTokenAccountInstruction(
-        ASSOCIATED_TOKEN_PROGRAM_ID,
-        TOKEN_PROGRAM_ID,
-        mint,
-        aTokenAccountPubkey,
-        owner.publicKey,
-        owner.publicKey
-      )
-    );
-    await connection.sendTransaction(transaction, [owner]);
-    return {
-      address: aTokenAccountPubkey,
-      owner: owner.publicKey,
-      mint,
-    } as TokenAccount;
-  }
-}
-
-export async function getOwnedTokenAccounts(
-  provider: Provider
-): Promise<TokenAccount[]> {
-  const accounts = await provider.connection.getProgramAccounts(
-    TOKEN_PROGRAM_ID,
-    {
-      filters: [
-        {
-          memcmp: {
-            offset: AccountLayout.offsetOf("owner"),
-            bytes: provider.wallet.publicKey.toBase58(),
-          },
-        },
-        {
-          dataSize: AccountLayout.span,
-        },
-      ],
-    }
-  );
-  return accounts.map((r) => {
-    const tokenAccount = parseTokenAccount(r.account.data);
-    tokenAccount.address = r.pubkey;
-    return tokenAccount;
-  });
-}
-
-export async function fetchTokenAccount(
-  provider: Provider,
-  address: PublicKey
-): Promise<AccountInfo> {
-  const tokenAccount = await getTokenAccount(provider, address);
-  tokenAccount.address = address;
-  return tokenAccount;
-}
-
-export async function createAssociatedTokenAccount(
-  provider: Provider,
-  mint: PublicKey
-): Promise<PublicKey> {
-  const aTokenAddr = await Token.getAssociatedTokenAddress(
-    ASSOCIATED_TOKEN_PROGRAM_ID,
-    TOKEN_PROGRAM_ID,
-    mint,
-    provider.wallet.publicKey
-  );
-  console.log(`Creating token account for ${mint.toString()}`);
-  await sendTransaction(
-    provider,
-    [
-      Token.createAssociatedTokenAccountInstruction(
-        ASSOCIATED_TOKEN_PROGRAM_ID,
-        TOKEN_PROGRAM_ID,
-        mint,
-        aTokenAddr,
-        provider.wallet.publicKey,
-        provider.wallet.publicKey
-      ),
-    ],
-    [],
-    true
-  );
-  return aTokenAddr;
-}
-
 export async function sendTransaction(
-  provider: Provider,
+  provider: AnchorProvider,
   instructions: TransactionInstruction[],
   signers: Keypair[],
   confirm?: boolean
@@ -192,15 +59,57 @@ export async function sendTransaction(
   }
 }
 
-export function defaultTokenAccount(
-  address: PublicKey,
-  owner: PublicKey,
-  mint: PublicKey
-): TokenAccount {
+export const parseTokenAccountFromBuf = (
+  info: AccountInfo<Buffer>,
+  address: PublicKey
+): TokenAccount => {
+  const rawAccount = AccountLayout.decode(info.data);
+
   return {
     address,
-    owner,
-    mint,
-    amount: new BN(0),
-  } as TokenAccount;
-}
+    mint: new PublicKey(rawAccount.mint),
+    owner: new PublicKey(rawAccount.owner),
+    amount: u64.fromBuffer(rawAccount.amount),
+    delegate:
+      rawAccount.delegateOption === 0
+        ? new PublicKey(rawAccount.delegate)
+        : null,
+    delegatedAmount:
+      rawAccount.delegateOption === 0
+        ? new u64(0)
+        : u64.fromBuffer(rawAccount.delegatedAmount),
+    // state enum: https://solana-labs.github.io/solana-program-library/token/js/enums/AccountState.html
+    isInitialized: rawAccount.state !== 0,
+    isFrozen: rawAccount.state === 2,
+    isNative: !!rawAccount.isNativeOption,
+    rentExemptReserve:
+      rawAccount.isNativeOption === 1
+        ? u64.fromBuffer(rawAccount.isNative)
+        : null,
+    closeAuthority: rawAccount.closeAuthorityOption
+      ? new PublicKey(rawAccount.closeAuthority)
+      : null,
+  };
+};
+
+export const parseTokenAccount = (
+  address: PublicKey,
+  info: AccountInfo<ParsedAccountData>
+): TokenAccountDetail => {
+  const { data } = info;
+  const detailInfo = data.parsed["info"];
+  return {
+    address,
+    isNative: detailInfo["isNative"],
+    mint: new PublicKey(detailInfo["mint"]),
+    owner: new PublicKey(detailInfo["owner"]),
+    state: detailInfo["state"],
+    amount: new BN(detailInfo["tokenAmount"]["amount"]),
+    tokenAmount: {
+      amount: new BN(detailInfo["tokenAmount"]["amount"]),
+      decimals: detailInfo["tokenAmount"]["decimals"],
+      uiAmount: detailInfo["tokenAmount"]["uiAmount"],
+      uiAmountString: detailInfo["tokenAmount"]["uiAmountString"],
+    },
+  };
+};
