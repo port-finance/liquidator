@@ -153,7 +153,7 @@ export const rebalanceCoins = async (
         );
       } catch (e) {
         log.alert.warn(
-          `rebalance swap failed: ${"error"}, trying [-${payload.inputAmount
+          `rebalance swap failed: ${e}, trying [-${payload.inputAmount
             .div(aggCoinInfo[payload.inputMint].decimal)
             .toString()} ${aggCoinInfo[payload.inputMint].assetName}] -> [+? ${
             aggCoinInfo[payload.outputMint].assetName
