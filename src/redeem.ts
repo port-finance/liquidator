@@ -3,6 +3,7 @@ import {
   ReserveInfo,
   refreshReserveInstruction,
   redeemReserveCollateralInstruction,
+  AssetContext,
 } from "@port.finance/port-sdk";
 import { AnchorProvider, BN } from "@project-serum/anchor";
 import { Keypair, PublicKey, TransactionInstruction } from "@solana/web3.js";
@@ -15,6 +16,7 @@ import { TokenAccountDetail } from "./types";
 export async function redeemRemainingCollaterals(
   provider: AnchorProvider,
   programId: PublicKey,
+  assetCtx: AssetContext,
   reserveContext: ReserveContext,
   wallets: Map<string, TokenAccountDetail>
 ) {
@@ -35,6 +37,11 @@ export async function redeemRemainingCollaterals(
       );
     }
 
+    const withdrawTokenName = assetCtx
+      .findConfigByReserveId(reserve.getReserveId())
+      ?.getDisplayConfig()
+      .getName();
+
     try {
       const collateralWallet = await fetchTokenAccount(
         provider.connection,
@@ -42,11 +49,14 @@ export async function redeemRemainingCollaterals(
       );
       wallets.set(reserve.getShareMintId().toString(), collateralWallet);
       if (!collateralWallet.amount.isZero()) {
-        await redeemCollateral(
+        const redeemSig = await redeemCollateral(
           provider,
           wallets,
           reserve,
           lendingMarketAuthority
+        );
+        log.common.warn(
+          `Redeemed ${collateralWallet.amount.toString()} lamport of ${withdrawTokenName} collateral tokens: ${redeemSig}`
         );
       }
     } catch (e) {

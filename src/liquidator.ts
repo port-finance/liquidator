@@ -28,7 +28,7 @@ import {
   PORT_ENV,
   SOL_MINT as SOL_MINT_ID,
 } from "./const";
-import { redeemCollateral, redeemRemainingCollaterals } from "./redeem";
+import { redeemRemainingCollaterals } from "./redeem";
 import {
   fetchStakingAccounts,
   fetchTokenAccount,
@@ -60,6 +60,7 @@ async function runLiquidator() {
   log.common.info(`Port liquidator launched on cluster=${clusterUrl}`);
 
   const reserveContext = await portApi.getReserveContext();
+  const assetContext = portEnv.getAssetContext();
 
   const wallets = await prepareTokenAccounts(provider, reserveContext);
 
@@ -82,7 +83,7 @@ async function runLiquidator() {
       );
 
       for (const unhealthyObligation of unhealthyObligations) {
-        log.common.info(
+        log.common.warn(
           `Liquidating obligation account ${unhealthyObligation.obligation
             .getProfileId()
             .toString()} which is owned by ${unhealthyObligation.obligation
@@ -103,6 +104,7 @@ async function runLiquidator() {
         await redeemRemainingCollaterals(
           provider,
           programId,
+          assetContext,
           reserveContext,
           wallets
         );
@@ -232,6 +234,13 @@ async function liquidateUnhealthyObligation(
         .div(new BN(100))
     );
     if (realAmount.lte(new u64(0))) {
+      log.alert.warn(
+        `liquidate by paying token, obligation ${obligation.obligation
+          .getId()
+          .toString()}, repay[${repayTokenName} with loan ${repayLoan
+          .toU64()
+          .toString()}], withdraw ${withdrawTokenName}: liquidate amount invalid ${realAmount.toString()}`
+      );
       throw Error(
         `liquidate by paying token, repay[${repayTokenName} with loan ${repayLoan
           .toU64()
@@ -259,6 +268,13 @@ async function liquidateUnhealthyObligation(
       : repayAmount;
 
     if (realAmount.lte(new u64(0))) {
+      log.alert.warn(
+        `liquidate by paying SOL, obligation ${obligation.obligation
+          .getId()
+          .toString()}: repay[${repayTokenName} with loan ${repayLoan
+          .toU64()
+          .toString()}], withdraw ${withdrawTokenName}: liquidate amount invalid ${realAmount.toString()}`
+      );
       throw Error(
         `liquidate by paying SOL: liquidate amount invalid ${realAmount.toString()}`
       );
@@ -283,29 +299,19 @@ async function liquidateUnhealthyObligation(
     instructions,
     signers,
     true
-  );
+  ).catch((reason) => {
+    log.alert.warn(
+      `Liqudiation transaction sent failed: obligation ${obligation.obligation
+        .getId()
+        .toString()}, paying ${repayTokenName} for ${withdrawTokenName}, reason: ${reason}`
+    );
+    throw reason;
+  });
 
   log.common.warn(
-    `Liqudiation transaction sent successfully: ${liquidationSig}, paying ${repayTokenName} for ${withdrawTokenName}.`
-  );
-
-  const latestCollateralWallet = await fetchTokenAccount(
-    provider.connection,
-    withdrawWallet.address
-  );
-  wallets.set(
-    withdrawReserve.getShareMintId().toString(),
-    latestCollateralWallet
-  );
-  const redeemSig = await redeemCollateral(
-    provider,
-    wallets,
-    withdrawReserve,
-    lendingMarketAuthority
-  );
-
-  log.common.warn(
-    `Redeemed ${latestCollateralWallet.amount.toString()} lamport of ${withdrawTokenName} collateral tokens: ${redeemSig}`
+    `Liqudiation tx sent successfully: ${liquidationSig}, obligation ${obligation.obligation
+      .getId()
+      .toString()}, paying ${repayTokenName} for ${withdrawTokenName}.`
   );
 }
 
