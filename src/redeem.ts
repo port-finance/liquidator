@@ -4,9 +4,9 @@ import {
   refreshReserveInstruction,
   redeemReserveCollateralInstruction,
 } from "@port.finance/port-sdk";
-import { AnchorProvider } from "@project-serum/anchor";
+import { AnchorProvider, BN } from "@project-serum/anchor";
 import { Keypair, PublicKey, TransactionInstruction } from "@solana/web3.js";
-import { Token, TOKEN_PROGRAM_ID } from "@solana/spl-token";
+import { Token, TOKEN_PROGRAM_ID, u64 } from "@solana/spl-token";
 import { sendTransaction } from "./utils";
 import { fetchTokenAccount } from "./account";
 import { log } from "./infra/logger";
@@ -75,6 +75,10 @@ export async function redeemCollateral(
     throw new Error("No collateral or liquidity wallet found.");
   }
 
+  if (collateralWallet.amount.lte(new BN(0))) {
+    throw new Error("No collateral asset found.");
+  }
+
   instructions.push(
     Token.createApproveInstruction(
       TOKEN_PROGRAM_ID,
@@ -82,7 +86,7 @@ export async function redeemCollateral(
       transferAuthority.publicKey,
       provider.wallet.publicKey,
       [],
-      collateralWallet.amount
+      new u64(collateralWallet.amount.toString())
     ),
     refreshReserveInstruction(
       withdrawReserve.getReserveId(),

@@ -35,7 +35,7 @@ export async function sendTransaction(
     transaction.add(instruction);
   });
   transaction.recentBlockhash = (
-    await provider.connection.getRecentBlockhash("singleGossip")
+    await provider.connection.getLatestBlockhash("confirmed")
   ).blockhash;
 
   if (signers.length > 0) {
@@ -46,11 +46,14 @@ export async function sendTransaction(
   const rawTransaction = transaction.serialize();
   const options = {
     skipPreflight: true,
-    commitment: "singleGossip",
+    commitment: "confirmed",
   };
 
   if (!confirm) {
-    return provider.connection.sendRawTransaction(rawTransaction, options);
+    return await provider.connection.sendRawTransaction(
+      rawTransaction,
+      options
+    );
   } else {
     return await sendAndConfirmRawTransaction(
       provider.connection,

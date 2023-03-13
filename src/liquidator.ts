@@ -7,7 +7,7 @@ import {
 } from "@solana/web3.js";
 import { sendTransaction, sleep } from "./utils";
 import { AccountLayout, Token, TOKEN_PROGRAM_ID, u64 } from "@solana/spl-token";
-import { AnchorProvider, Wallet } from "@project-serum/anchor";
+import { AnchorProvider, Wallet, BN } from "@project-serum/anchor";
 import {
   liquidateObligationInstruction,
   Port,
@@ -214,16 +214,31 @@ async function liquidateUnhealthyObligation(
     repayWallet.address
   );
 
+  const assetContext = portEnv.getAssetContext();
+  const repayTokenName = assetContext
+    .findConfigByReserveId(repayReserve.getReserveId())
+    ?.getDisplayConfig()
+    .getName();
+  const withdrawTokenName = assetContext
+    .findConfigByReserveId(withdrawReserve.getReserveId())
+    ?.getDisplayConfig()
+    .getName();
+
   if (repayReserve.getAssetMintId().toString() !== SOL_MINT_ID) {
     const realAmount = u64.min(
       repayAmount,
-      latestRepayWallet.amount.mul(new u64(LIQUIDATOR_REDUCE_FACTOR))
+      latestRepayWallet.amount
+        .mul(new BN(LIQUIDATOR_REDUCE_FACTOR * 100))
+        .div(new BN(100))
     );
     if (realAmount.lte(new u64(0))) {
       throw Error(
-        `liquidate by paying token: liquidate amount invalid ${realAmount.toString()}`
+        `liquidate by paying token, repay[${repayTokenName} with loan ${repayLoan
+          .toU64()
+          .toString()}], withdraw ${withdrawTokenName}: liquidate amount invalid ${realAmount.toString()}`
       );
     }
+
     await liquidateByPayingToken(
       provider,
       instructions,
@@ -234,7 +249,8 @@ async function liquidateUnhealthyObligation(
       withdrawReserve,
       obligation.obligation,
       lendingMarket,
-      lendingMarketAuthority
+      lendingMarketAuthority,
+      programId
     );
   } else {
     const availableAmount = new u64(payerAccount.lamports - LAMPORT_DECIMAL);
@@ -257,22 +273,20 @@ async function liquidateUnhealthyObligation(
       withdrawReserve,
       obligation.obligation,
       lendingMarket,
-      lendingMarketAuthority
+      lendingMarketAuthority,
+      programId
     );
   }
 
-  const liquidationSig = await sendTransaction(provider, instructions, signers);
-  const assetContext = portEnv.getAssetContext();
-  const repayTokenName = assetContext
-    .findConfigByReserveId(repayReserve.getReserveId())
-    ?.getDisplayConfig()
-    .getName();
-  const withdrawTokenName = assetContext
-    .findConfigByReserveId(withdrawReserve.getReserveId())
-    ?.getDisplayConfig()
-    .getName();
+  const liquidationSig = await sendTransaction(
+    provider,
+    instructions,
+    signers,
+    true
+  );
+
   log.common.warn(
-    `Liqudiation transaction sent successfule: ${liquidationSig}, paying ${repayTokenName} for ${withdrawTokenName}.`
+    `Liqudiation transaction sent successfully: ${liquidationSig}, paying ${repayTokenName} for ${withdrawTokenName}.`
   );
 
   const latestCollateralWallet = await fetchTokenAccount(
@@ -305,7 +319,8 @@ async function liquidateByPayingSOL(
   withdrawReserve: ReserveInfo,
   obligation: PortProfile,
   lendingMarket: PublicKey,
-  lendingMarketAuthority: PublicKey
+  lendingMarketAuthority: PublicKey,
+  lendingProgramId: PublicKey
 ): Promise<void> {
   const wrappedSOLTokenAccount = new Keypair();
   instructions.push(
@@ -334,7 +349,8 @@ async function liquidateByPayingSOL(
     withdrawReserve,
     obligation,
     lendingMarket,
-    lendingMarketAuthority
+    lendingMarketAuthority,
+    lendingProgramId
   );
 
   instructions.push(
@@ -360,7 +376,8 @@ async function liquidateByPayingToken(
   withdrawReserve: ReserveInfo,
   obligation: PortProfile,
   lendingMarket: PublicKey,
-  lendingMarketAuthority: PublicKey
+  lendingMarketAuthority: PublicKey,
+  lendingProgramId: PublicKey
 ): Promise<void> {
   const stakeAccounts = await fetchStakingAccounts(
     provider.connection,
@@ -389,6 +406,7 @@ async function liquidateByPayingToken(
       lendingMarket,
       lendingMarketAuthority,
       provider.wallet.publicKey,
+      lendingProgramId,
       withdrawReserve.getStakingPoolId() !== null
         ? withdrawReserve.getStakingPoolId()
         : undefined,

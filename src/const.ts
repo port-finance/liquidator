@@ -33,7 +33,7 @@ export const PORT_ENV = (() => {
     CLUSTER_URL:
       process.env.CLUSTER_URL ??
       "https://port-finance.rpcpool.com/385f15db-1967-4777-a05e-3c0ad9afd955",
-    CHECK_INTERVAL: parseFloat(process.env.CHECK_INTERVAL || "8000"),
+    CHECK_INTERVAL: parseFloat(process.env.CHECK_INTERVAL || "10000"),
     CONFIG_FILE: process.env.CONFIG_FILE ?? "./config/liquidator.json",
   };
 })();
