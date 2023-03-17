@@ -56,7 +56,7 @@ export async function redeemRemainingCollaterals(
           lendingMarketAuthority
         );
         log.common.warn(
-          `Redeemed ${collateralWallet.amount.toString()} lamport of ${withdrawTokenName} collateral tokens: ${redeemSig}`
+          `Redeemed ${collateralWallet.amount.toString()} lamport of ${withdrawTokenName} collateral tokens, transaction: ${redeemSig}`
         );
       }
     } catch (e) {
