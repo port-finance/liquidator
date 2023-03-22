@@ -16,6 +16,7 @@ Make sure to add the `~/.config/solana/id` file to look something like this, and
 ```
 # URL is optional (For alert message)
 # cat ~/.config/solana/id
+CLUSTER_URL=YourSolanaClusterURL
 KEYPAIR=YourBase58KeyPair
 ALERT_WEBHOOK_URL=
 HEARTBEAT_WEBHOOK_URL=
