@@ -132,6 +132,11 @@ export const rebalanceCoins = async (
   for (const coinType of swapSequence) {
     const payload = await getCoinSwapOption(coinType);
     if (payload) {
+      log.common.info(
+        `trying swap [-${payload?.inputAmount
+          .div(aggCoinInfo[payload?.inputMint].decimal)
+          .toString()} ${payload?.inputMint}] -> [+? ${payload?.outputMint}]`
+      );
       try {
         const res = await jupiterSwap.swapWithBestRoute(
           new PublicKey(payload.inputMint),
@@ -162,6 +167,7 @@ export const rebalanceCoins = async (
       }
     }
   }
+  log.common.info(`Rebalance finished!`);
 };
 
 function getAggCoinInfo(

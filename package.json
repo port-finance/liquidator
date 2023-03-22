@@ -23,7 +23,7 @@
     "typescript": "^4.9.5"
   },
   "dependencies": {
-    "@jup-ag/core": "4.0.0-beta.13",
+    "@jup-ag/core": "4.0.0-beta.16",
     "@port.finance/port-sdk": "^0.2.69",
     "@project-serum/anchor": "0.24.2",
     "@project-serum/serum": "^0.13.41",

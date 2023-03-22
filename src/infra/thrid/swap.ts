@@ -1,6 +1,6 @@
 import JSBI from "jsbi";
 import { Connection, Keypair, PublicKey } from "@solana/web3.js";
-import { Jupiter, TOKEN_LIST_URL, TransactionError } from "@jup-ag/core";
+import { Jupiter, TOKEN_LIST_URL } from "@jup-ag/core";
 import Big from "big.js";
 
 export interface Token {
@@ -71,7 +71,15 @@ export class JupiterSwap {
     const swapResult = await execute();
 
     if (swapResult["error"]) {
-      const res = swapResult as { error: TransactionError };
+      const res = swapResult as {
+        error: {
+          txid?: string;
+          code?: number;
+          name: string;
+          message: string;
+          stack?: string;
+        };
+      };
       throw Error(`Jupiter swap failed: ${res.error}`);
     } else {
       const res = swapResult as {

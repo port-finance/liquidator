@@ -1,11 +1,12 @@
 {
   "stableCoin": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
   "valueRatios": {
-    "default": 0,
+    "default": 0.01,
     "overrides": {
       "So11111111111111111111111111111111111111112": 0.1,
       "Ea5SjE2Y6yvCeW5dYTn7PYMuW5ikXkvbGdcmSnXeaLjS": 1,
-      "mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So": 0.1
+      "mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So": 0.1,
+      "2poo1w1DL6yd2WNTCnNTzDqkC6MBXq7axo77P16yrBuf": 0
     }
   }
 }

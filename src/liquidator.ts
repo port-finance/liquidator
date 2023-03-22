@@ -64,6 +64,7 @@ async function runLiquidator() {
 
   const wallets = await prepareTokenAccounts(provider, reserveContext);
 
+  log.common.info(`wallet token account prepared`);
   while (true) {
     try {
       await rebalanceCoins(

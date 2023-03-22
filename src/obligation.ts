@@ -53,7 +53,10 @@ obligation pubkey: ${ob.obligation.getProfileId().toString()}`)
     );
   });
 
-  return sortedObligations.filter((obigation) => obigation.riskFactor >= 1);
+  return sortedObligations.filter(
+    (obigation) =>
+      obigation.riskFactor >= 1 && obigation.totalLoanValue.gte(0.05)
+  );
 }
 
 function willNeverLiquidate(obligation: PortProfile): boolean {
