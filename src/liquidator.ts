@@ -419,12 +419,10 @@ async function liquidateByPayingToken(
       lendingMarketAuthority,
       provider.wallet.publicKey,
       lendingProgramId,
-      withdrawReserve.getStakingPoolId() !== null
+      withdrawReserve.getStakingPoolId()
         ? withdrawReserve.getStakingPoolId()
         : undefined,
-      withdrawReserve.getStakingPoolId() !== null
-        ? stakeAccounts[0].pubkey
-        : undefined
+      withdrawReserve.getStakingPoolId() ? stakeAccounts[0].pubkey : undefined
     )
   );
 }

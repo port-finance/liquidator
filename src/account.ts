@@ -67,7 +67,7 @@ export async function fetchStakingAccounts(
     account: AccountInfo<Buffer>;
   }>
 > {
-  if (stakingPool === null) {
+  if (!stakingPool) {
     return [];
   }
   return await connection.getProgramAccounts(STAKING_PROGRAM_ID, {
