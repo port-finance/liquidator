@@ -94,21 +94,26 @@ async function runLiquidator() {
           }, which has borrowed ${unhealthyObligation.totalLoanValue} ...`
         );
 
-        await liquidateUnhealthyObligation(
-          provider,
-          programId,
-          unhealthyObligation,
-          reserveContext,
-          wallets
-        );
+        try {
+          await liquidateUnhealthyObligation(
+            provider,
+            programId,
+            unhealthyObligation,
+            reserveContext,
+            wallets
+          );
 
-        await redeemRemainingCollaterals(
-          provider,
-          programId,
-          assetContext,
-          reserveContext,
-          wallets
-        );
+          await redeemRemainingCollaterals(
+            provider,
+            programId,
+            assetContext,
+            reserveContext,
+            wallets
+          );
+        } catch (reason) {
+          log.alert.warn(`Liquidation failed: ${reason}`);
+          continue;
+        }
       }
     } catch (e) {
       log.alert.info(`unknown error: ${e}`);
