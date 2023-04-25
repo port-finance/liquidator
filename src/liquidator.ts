@@ -111,7 +111,7 @@ async function runLiquidator() {
             wallets
           );
         } catch (reason) {
-          log.alert.warn(`Liquidation failed: ${reason}`);
+          log.alert.info(`Liquidation failed: ${reason}`);
           continue;
         }
       }
