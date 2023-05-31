@@ -55,7 +55,7 @@ obligation pubkey: ${ob.obligation.getProfileId().toString()}`)
 
   return sortedObligations.filter(
     (obigation) =>
-      obigation.riskFactor >= 1 && obigation.totalLoanValue.gte(0.05)
+      obigation.riskFactor >= 1 && obigation.totalLoanValue.gte(0.08)
   );
 }
 
