@@ -73,7 +73,13 @@ async function runLiquidator() {
         await JupiterSwap.new(connection, payer),
         payer.publicKey
       );
+    } catch (reason) {
+      log.alert.warn(
+        `rebalance failed with error: ${reason}, will skip and try it in next loop`
+      );
+    }
 
+    try {
       log.common.info(`start fetching unhealthy obligations...`);
       const unhealthyObligations = await getUnhealthyObligations(connection);
       log.common.info(
