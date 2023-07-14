@@ -275,9 +275,16 @@ async function liquidateUnhealthyObligation(
     );
   } else {
     const availableAmount = new u64(payerAccount.lamports - LAMPORT_DECIMAL);
-    const realAmount = repayAmount.gt(availableAmount)
+    if (availableAmount.lt(new u64(LAMPORT_DECIMAL))) {
+      throw Error(
+        `insufficient SOL to create SPL token account: ${payerAccount.lamports}`
+      );
+    }
+
+    let realAmount = repayAmount.gt(availableAmount)
       ? u64.min(repayAmount.div(new u64(2)).add(new u64(1)), availableAmount)
       : repayAmount;
+    realAmount = u64.max(realAmount, new u64(LAMPORT_DECIMAL));
 
     if (realAmount.lte(new u64(0))) {
       log.alert.warn(
