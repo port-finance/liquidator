@@ -27,6 +27,7 @@ import {
   portEnv,
   PORT_ENV,
   SOL_MINT as SOL_MINT_ID,
+  DEPRECATED_RESERVES,
 } from "./const";
 import { redeemRemainingCollaterals } from "./redeem";
 import {
@@ -153,16 +154,32 @@ async function liquidateUnhealthyObligation(
   );
   const instructions: TransactionInstruction[] = [];
   const signers: Keypair[] = [];
+  const assetContext = portEnv.getAssetContext();
 
-  const toRefreshReserves: Set<ReserveId> = new Set();
+  const toRefreshReserves: Set<string> = new Set();
   obligation.obligation.getLoans().forEach((borrow) => {
-    toRefreshReserves.add(borrow.getReserveId());
+    toRefreshReserves.add(borrow.getReserveId().toString());
   });
   obligation.obligation.getCollaterals().forEach((deposit) => {
-    toRefreshReserves.add(deposit.getReserveId());
+    toRefreshReserves.add(deposit.getReserveId().toString());
   });
+
+  for (const deprecated of DEPRECATED_RESERVES) {
+    if (toRefreshReserves.has(deprecated)) {
+      log.common.warn(
+        `Obligation account ${obligation.obligation
+          .getProfileId()
+          .toString()} which is owned by ${obligation.obligation
+          .getOwner()
+          ?.toBase58()} with DEPREACATED RESERVE: ${deprecated}, skipped`
+      );
+      return;
+    }
+  }
   toRefreshReserves.forEach((reserve) => {
-    const reserveInfo = reserveContext.getReserve(reserve);
+    const reserveInfo = reserveContext.getReserve(
+      ReserveId.fromBase58(reserve)
+    );
     instructions.push(
       refreshReserveInstruction(
         reserveInfo.getReserveId(),
@@ -228,7 +245,6 @@ async function liquidateUnhealthyObligation(
     repayWallet.address
   );
 
-  const assetContext = portEnv.getAssetContext();
   const repayTokenName = assetContext
     .findConfigByReserveId(repayReserve.getReserveId())
     ?.getDisplayConfig()
@@ -302,7 +318,7 @@ async function liquidateUnhealthyObligation(
       provider,
       instructions,
       signers,
-      realAmount,
+      realAmount.muln(2),
       withdrawWallet.address,
       repayReserve,
       withdrawReserve,

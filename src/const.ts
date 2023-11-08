@@ -21,6 +21,10 @@ export const SWITCHBOARD_PROGRAM_V1 =
 export const SWITCHBOARD_PROGRAM_V2 =
   "SW1TCH7qEPTdLsDHRgPuMQjbQxKdH2aBStViMFnt64f";
 
+export const DEPRECATED_RESERVES = [
+  "BnhsmYVvNjXK3TGDHLj1Yr1jBGCmD1gZMkAyCwoXsHwt",
+];
+
 export const PORT_ENV = (() => {
   return {
     HEARTBEAT_WEBHOOK_URL: process.env.HEARTBEAT_WEBHOOK_URL,

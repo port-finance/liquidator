@@ -16,6 +16,7 @@ export async function getUnhealthyObligations(connection: Connection) {
     connection: connection,
   });
   const portBalances = await mainnetPort.getAllPortProfiles();
+  log.common.info(`Total number of profiles are ${portBalances.length}`);
   const reserves = await mainnetPort.getReserveContext();
   const tokenToCurrentPrice = await readReservePrices(connection, reserves);
   const sortedObligations = portBalances
