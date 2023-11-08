@@ -8,7 +8,7 @@ import { Connection } from "@solana/web3.js";
 import { readReservePrices } from "./price";
 import Big from "big.js";
 import { AssetDetail, EnrichedObligation } from "./types";
-import { DISPLAY_FIRST, portEnv, ZERO } from "./const";
+import { DEPRECATED_RESERVES, DISPLAY_FIRST, portEnv, ZERO } from "./const";
 import { log } from "./infra/logger";
 
 export async function getUnhealthyObligations(connection: Connection) {
@@ -54,10 +54,36 @@ obligation pubkey: ${ob.obligation.getProfileId().toString()}`)
     );
   });
 
-  return sortedObligations.filter(
-    (obigation) =>
-      obigation.riskFactor >= 1 && obigation.totalLoanValue.gte(0.08)
-  );
+  const filted = sortedObligations
+    .filter(
+      (obigation) =>
+        obigation.riskFactor >= 1 && obigation.totalLoanValue.gte(0.08)
+    )
+    .filter((obligation) => {
+      const toRefreshReserves: Set<string> = new Set();
+      obligation.obligation.getLoans().forEach((borrow) => {
+        toRefreshReserves.add(borrow.getReserveId().toString());
+      });
+      obligation.obligation.getCollaterals().forEach((deposit) => {
+        toRefreshReserves.add(deposit.getReserveId().toString());
+      });
+
+      for (const deprecated of DEPRECATED_RESERVES) {
+        if (toRefreshReserves.has(deprecated)) {
+          log.common.warn(
+            `Obligation account ${obligation.obligation
+              .getProfileId()
+              .toString()} which is owned by ${obligation.obligation
+              .getOwner()
+              ?.toBase58()} with DEPREACATED RESERVE: ${deprecated}, skipped`
+          );
+          return false;
+        }
+      }
+      return true;
+    });
+
+  return filted;
 }
 
 function willNeverLiquidate(obligation: PortProfile): boolean {

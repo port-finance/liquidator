@@ -27,7 +27,6 @@ import {
   portEnv,
   PORT_ENV,
   SOL_MINT as SOL_MINT_ID,
-  DEPRECATED_RESERVES,
 } from "./const";
 import { redeemRemainingCollaterals } from "./redeem";
 import {
@@ -164,18 +163,6 @@ async function liquidateUnhealthyObligation(
     toRefreshReserves.add(deposit.getReserveId().toString());
   });
 
-  for (const deprecated of DEPRECATED_RESERVES) {
-    if (toRefreshReserves.has(deprecated)) {
-      log.common.warn(
-        `Obligation account ${obligation.obligation
-          .getProfileId()
-          .toString()} which is owned by ${obligation.obligation
-          .getOwner()
-          ?.toBase58()} with DEPREACATED RESERVE: ${deprecated}, skipped`
-      );
-      return;
-    }
-  }
   toRefreshReserves.forEach((reserve) => {
     const reserveInfo = reserveContext.getReserve(
       ReserveId.fromBase58(reserve)
