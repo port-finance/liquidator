@@ -70,7 +70,7 @@ obligation pubkey: ${ob.obligation.getProfileId().toString()}`)
 
       for (const deprecated of DEPRECATED_RESERVES) {
         if (toRefreshReserves.has(deprecated)) {
-          log.common.warn(
+          log.common.info(
             `Obligation account ${obligation.obligation
               .getProfileId()
               .toString()} which is owned by ${obligation.obligation
