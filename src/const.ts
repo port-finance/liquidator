@@ -22,7 +22,8 @@ export const SWITCHBOARD_PROGRAM_V2 =
   "SW1TCH7qEPTdLsDHRgPuMQjbQxKdH2aBStViMFnt64f";
 
 export const DEPRECATED_RESERVES = [
-  "BnhsmYVvNjXK3TGDHLj1Yr1jBGCmD1gZMkAyCwoXsHwt",
+  "BnhsmYVvNjXK3TGDHLj1Yr1jBGCmD1gZMkAyCwoXsHwt", // MER
+  "BXt3EhK5Tj81aKaVSBD27rLFd5w8A6wmGKDh47JWohEu", // saber USDC/T LP
 ];
 
 export const PORT_ENV = (() => {
